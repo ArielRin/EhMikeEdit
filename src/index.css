@@ -1,0 +1,82 @@
+@font-face {
+  font-family: 'Kredit';
+  src: url('/fonts/Kredit.ttf') format('truetype');
+}
+
+.background-image {
+  background-image: url('/images/b3.png');
+  background-size: cover;       /* Adjusts the image to cover the entire element */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-position: center;  /* Centers the image */
+  width: 100%;
+  height: 100vh;                /* Adjust the height as needed */
+}
+
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Add specific styles for header content */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0); /* Transparent background */
+  color: white;
+}
+
+.logo {
+  width: 220px; /* 70% smaller than the original size */
+  height: auto;
+  margin-right: 10px; /* Adjust the margin as needed */
+}
+
+.connect-button {
+  margin-left: auto;
+}
+
+/* Additional styles */
+.contractaddr {
+  margin-top: 8px; /* Adjust the margin as needed */
+  font-size: 12px; /* Adjust the font size as needed */
+  color: white;
+}
+
+.paragraph1 {
+  margin-top: 8px; /* Adjust the margin as needed */
+  font-size: 14px; /* Adjust the font size as needed */
+}
+
+.pricecost, .ttitle, .supplynft {
+  font-family: 'Kredit', sans-serif; /* Apply Kredit font */
+}
+
+.pricecost {
+  margin-top: 20px; /* Adjust the margin as needed */
+  font-size: 24px; /* Adjust the font size as needed */
+}
+
+.ttitle {
+  margin-top: 20px; /* Adjust the margin as needed */
+  font-size: 38px; /* Adjust the font size as needed */
+}
+
+.supplynft {
+  margin-top: 1px; /* Adjust the margin as needed */
+  font-size: 24px; /* Adjust the font size as needed */
+}
+
+.logotextheader {
+  width: 10px; /* Adjust the width as needed */
+  height: 10px; /* Adjust the height as needed */
+  margin-right: 10px; /* Adjust the margin as needed */
+}
+
+.logobody {
+  display: block; /* Ensures that the image is a block element */
+  margin: 0 auto; /* Centers the image horizontally */
+  max-width: 100%; /* Ensures the image doesn't exceed its container */
+  padding: 20px; /* Add padding as needed */
+}
