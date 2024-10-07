@@ -119,7 +119,7 @@ const NewPage = () => {
               </Box>
 
 
-              
+
             </Flex>
             <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
               <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" bg="rgba(0, 0, 0, 0.61)" border="2px" borderColor="#fff">
@@ -129,11 +129,26 @@ const NewPage = () => {
                   </Text>
                   <Image src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
                 </RouterLink>
+                <Box textAlign="center" mt={4}>
+                  <Text mb={2}>
+                    Connect your wallet and buy your presale tokens now! Once the presale is over,
+                    you will be able to claim your tokens here by hitting the claim button.
+                  </Text>
+                  <Text mb={2}>
+                    Once all tokens are claimed, you can trade them on Uniswap or HODL for the 2000X that's coming!!!
+                    Good Luck, Diamond Hands Win!!
+                  </Text>
+                  <Text>Have fun!!</Text>
+                </Box>
               </Box>
             </Flex>
+
           </Box>
         </Box>
       </Box>
+
+
+
       <Footer />
     </>
   );
