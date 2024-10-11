@@ -47,6 +47,11 @@ const ethersConfig = defaultConfig({
   },
   defaultChainId: 8453,
   rpcUrl: 'https://mainnet.base.org',
+  auth: {
+    email: false,
+    showWallets: true,
+    walletFeatures: true
+  }
 });
 
 const modal = createWeb3Modal({
@@ -56,8 +61,10 @@ const modal = createWeb3Modal({
   enableAnalytics: true,
   themeMode: 'dark',
   themeVariables: {
-    '--w3m-color-mix': 'grey',
-    '--w3m-accent': '#313131',
+    '--w3m-color-mix': '#2854f3',
+    '--w3m-accent': '#dc9710',
+    '--w3m-color-mix-strength': 22
+
   },
   chainImages: {
       8453: '/images/base.png',
@@ -65,7 +72,8 @@ const modal = createWeb3Modal({
       84532: '/images/baset.png',
     },
   featuredWalletIds: [
-    'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'
+    'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
+    '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0'
   ]
 });
 
