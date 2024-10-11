@@ -5,8 +5,9 @@ import './styles.css';
 import Intro from './Intro';
 import IntroBABY from './IntroBABY';
 import Presalecomponent from './Presalecomponent';
+import PresaleAdminPage from './PresaleAdminPage';
 
-Presalecomponent
+
 
 import { ethers, BrowserProvider } from 'ethers';
 import {
@@ -44,13 +45,8 @@ const ethersConfig = defaultConfig({
     url: '',
     icons: ['/logo.png']
   },
-  defaultChainId: 84532,
-  rpcUrl: 'https://sepolia.basescan.org',
-  auth: {
-    email: false,
-    showWallets: true,
-    walletFeatures: true
-  }
+  defaultChainId: 8453,
+  rpcUrl: 'https://mainnet.base.org',
 });
 
 const modal = createWeb3Modal({
@@ -122,6 +118,7 @@ const modal = createWeb3Modal({
         <Route path="/" element={<Intro />} />
           <Route path="/introbaby" element={<IntroBABY />} />
           <Route path="/presale" element={<Presalecomponent />} />
+          <Route path="/adminpresale" element={<PresaleAdminPage />} />
 
       </Routes>
     </Router>
