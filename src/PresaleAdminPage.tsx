@@ -1,48 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Flex, Image, Text, Button, Progress, useToast, Spinner
+  Box, Flex, Image, Text, Button, Progress, useToast
 } from '@chakra-ui/react';
-import { ethers } from 'ethers';
+import { ethers, Contract } from 'ethers';
 import { useWeb3ModalProvider } from '@web3modal/ethers/react';
 import presaleAbi from './Abi/presaleAbi.json';
 
-const USDT_ADDRESS = import.meta.env.VITE_USDT_ADDRESS;
-const PRESALE_CONTRACT_ADDRESS = import.meta.env.VITE_PRESALE_CONTRACT_ADDRESS;
-const PRESALE_TOKEN_ADDRESS = import.meta.env.VITE_PRESALE_TOKEN_ADDRESS;
-const targetDate = new Date(import.meta.env.VITE_TARGET_DATE);
+const USDT_ADDRESS = import.meta.env.VITE_USDT_ADDRESS as string;
+const PRESALE_CONTRACT_ADDRESS = import.meta.env.VITE_PRESALE_CONTRACT_ADDRESS as string;
+const PRESALE_TOKEN_ADDRESS = import.meta.env.VITE_PRESALE_TOKEN_ADDRESS as string;
+const targetDate = new Date(import.meta.env.VITE_TARGET_DATE as string);
 
-const AdminPresaleComponent = () => {
-  const [contract, setContract] = useState(null);
-  const [tokenContract, setTokenContract] = useState(null);
-  const [ethPrice, setEthPrice] = useState(null);
-  const [totalContributionsUSD, setTotalContributionsUSD] = useState('0');
-  const [totalTokensOffered, setTotalTokensOffered] = useState('0');
-  const [softCapUSD, setSoftCapUSD] = useState('0');
-  const [ethContribution, setEthContribution] = useState('0');
-  const [usdtContribution, setUsdtContribution] = useState('0');
-  const [ethBalance, setEthBalance] = useState('0');
-  const [usdtBalance, setUsdtBalance] = useState('0');
-  const [presaleTokenBalance, setPresaleTokenBalance] = useState('0');
-  const [isClaimEnabled, setIsClaimEnabled] = useState(false);
-  const [isPresaleSuccessful, setIsPresaleSuccessful] = useState(false);
-  const [isPresaleCancelled, setIsPresaleCancelled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+const AdminPresaleComponent: React.FC = () => {
+  const [contract, setContract] = useState<Contract | null>(null);
+  const [tokenContract, setTokenContract] = useState<Contract | null>(null);
+  const [ethPrice, setEthPrice] = useState<string | null>(null);
+  const [totalContributionsUSD, setTotalContributionsUSD] = useState<string>('0');
+  const [totalTokensOffered, setTotalTokensOffered] = useState<string>('0');
+  const [softCapUSD, setSoftCapUSD] = useState<string>('0');
+  const [ethContribution, setEthContribution] = useState<string>('0');
+  const [usdtContribution, setUsdtContribution] = useState<string>('0');
+  const [ethBalance, setEthBalance] = useState<string>('0');
+  const [usdtBalance, setUsdtBalance] = useState<string>('0');
+  const [presaleTokenBalance, setPresaleTokenBalance] = useState<string>('0');
+  const [isClaimEnabled, setIsClaimEnabled] = useState<boolean>(false);
+  const [isPresaleSuccessful, setIsPresaleSuccessful] = useState<boolean>(false);
+  const [isPresaleCancelled, setIsPresaleCancelled] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { walletProvider } = useWeb3ModalProvider();
   const toast = useToast();
 
   const initContract = async () => {
     if (walletProvider) {
-      const provider = new ethers.BrowserProvider(walletProvider);
+      const provider = new ethers.BrowserProvider(walletProvider as any);
       const signer = await provider.getSigner();
 
       try {
         const presaleContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, presaleAbi, signer);
         setContract(presaleContract);
 
-        const tokenContract = new ethers.Contract(PRESALE_TOKEN_ADDRESS, [
-          'function balanceOf(address) view returns (uint256)'
-        ], provider);
+        const tokenContract = new ethers.Contract(PRESALE_TOKEN_ADDRESS, ['function balanceOf(address) view returns (uint256)'], provider);
         setTokenContract(tokenContract);
 
         await fetchEthPrice(presaleContract);
@@ -57,7 +55,7 @@ const AdminPresaleComponent = () => {
     }
   };
 
-  const fetchEthPrice = async (contract) => {
+  const fetchEthPrice = async (contract: Contract) => {
     try {
       const price = await contract.getLatestETHPrice();
       const formattedPrice = ethers.formatUnits(price, 18);
@@ -67,21 +65,21 @@ const AdminPresaleComponent = () => {
     }
   };
 
-  const fetchPresaleDetails = async (contract) => {
+  const fetchPresaleDetails = async (contract: Contract) => {
     try {
       const totalTokens = await contract.totalTokensOfferedPresale();
       const softCap = await contract.softCapUSD();
       const totalContributions = await contract.totalContributionsUSD();
 
-      setTotalTokensOffered(parseFloat(ethers.formatUnits(totalTokens, 18)));
-      setSoftCapUSD(parseFloat(ethers.formatUnits(softCap, 6)));
-      setTotalContributionsUSD(parseFloat(ethers.formatUnits(totalContributions, 6)));
+      setTotalTokensOffered(ethers.formatUnits(totalTokens, 18));
+      setSoftCapUSD(ethers.formatUnits(softCap, 6));
+      setTotalContributionsUSD(ethers.formatUnits(totalContributions, 6));
     } catch (error) {
       console.error('Error fetching presale details:', error);
     }
   };
 
-  const fetchPresaleStatus = async (contract) => {
+  const fetchPresaleStatus = async (contract: Contract) => {
     try {
       const claimStatus = await contract.claimEnabled();
       const presaleSuccessStatus = await contract.presaleSuccessful();
@@ -95,28 +93,28 @@ const AdminPresaleComponent = () => {
     }
   };
 
-  const fetchUserContributions = async (contract) => {
+  const fetchUserContributions = async (contract: Contract) => {
     try {
       const ethContrib = await contract.ethContributions(PRESALE_CONTRACT_ADDRESS);
       const usdtContrib = await contract.usdtContributions(PRESALE_CONTRACT_ADDRESS);
 
-      setEthContribution(parseFloat(ethers.formatEther(ethContrib)).toFixed(5));
-      setUsdtContribution(parseFloat(ethers.formatUnits(usdtContrib, 6)).toFixed(5));
+      setEthContribution(ethers.formatEther(ethContrib));
+      setUsdtContribution(ethers.formatUnits(usdtContrib, 6));
     } catch (error) {
       console.error('Error fetching contributions:', error);
     }
   };
 
-  const fetchPresaleTokenBalance = async (tokenContract) => {
+  const fetchPresaleTokenBalance = async (tokenContract: Contract) => {
     try {
       const balance = await tokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
-      setPresaleTokenBalance(parseFloat(ethers.formatUnits(balance, 18)).toFixed(5));
+      setPresaleTokenBalance(ethers.formatUnits(balance, 18));
     } catch (error) {
       console.error('Error fetching token balance:', error);
     }
   };
 
-  const fetchEthAndUsdtBalances = async (provider) => {
+  const fetchEthAndUsdtBalances = async (provider: ethers.BrowserProvider) => {
     try {
       const ethBalance = await provider.getBalance(PRESALE_CONTRACT_ADDRESS);
       setEthBalance(ethers.formatEther(ethBalance));
@@ -130,6 +128,7 @@ const AdminPresaleComponent = () => {
   };
 
   const handleEnableClaim = async () => {
+    if (!contract) return;
     setIsLoading(true);
     try {
       const tx = await contract.enableClaimTokens();
@@ -158,6 +157,7 @@ const AdminPresaleComponent = () => {
   };
 
   const handleEndPresale = async () => {
+    if (!contract) return;
     setIsLoading(true);
     try {
       const tx = await contract.endPresale();
@@ -186,6 +186,7 @@ const AdminPresaleComponent = () => {
   };
 
   const handleCancelPresale = async () => {
+    if (!contract) return;
     setIsLoading(true);
     try {
       const tx = await contract.cancelPresale();
@@ -214,6 +215,7 @@ const AdminPresaleComponent = () => {
   };
 
   const handleWithdrawContributions = async () => {
+    if (!contract) return;
     setIsLoading(true);
     try {
       const tx = await contract.withdrawContributions();
@@ -242,6 +244,7 @@ const AdminPresaleComponent = () => {
   };
 
   const handleWithdrawRemainingTokens = async () => {
+    if (!contract) return;
     setIsLoading(true);
     try {
       const tx = await contract.withdrawRemainingTokens();
@@ -279,17 +282,16 @@ const AdminPresaleComponent = () => {
     <Box position="relative" flex={1} p={0} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
 
     <Flex flexDirection="column" p={6} borderRadius="xl" boxShadow="xl" color="white" width="100%" maxW="800px" mx="auto">
-      {/* Invoice Style Data Section */}
       <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg" mb={10}>
         <Image mb={8} src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" />
-        <Box align="center" mx="auto">
+        <Box textAlign="center" mx="auto">
           <w3m-button />
         </Box>
         <Text fontSize="lg" fontWeight="bold" mb={4}>Presale Overview</Text>
 
         <Flex justifyContent="space-between" mb={2}>
           <Text>Current ETH Price:</Text>
-          <Text>${parseFloat(ethPrice).toFixed(2)}</Text>
+          <Text>${ethPrice ? parseFloat(ethPrice).toFixed(2) : '0.00'}</Text>
         </Flex>
 
         <Flex justifyContent="space-between" mb={2}>
@@ -310,9 +312,9 @@ const AdminPresaleComponent = () => {
         <Flex justifyContent="space-between" alignItems="center" mb={4}>
           <Text>Progress:</Text>
           <Box width="60%">
-            <Progress value={(totalContributionsUSD / softCapUSD) * 100} colorScheme="green" borderRadius="md" />
+            <Progress value={(parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100} colorScheme="green" borderRadius="md" />
           </Box>
-          <Text>{((totalContributionsUSD / softCapUSD) * 100).toFixed(2)}%</Text>
+          <Text>{((parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100).toFixed(2)}%</Text>
         </Flex>
 
         <Flex fontSize="sm" justifyContent="space-between" mb={2}>
@@ -330,10 +332,12 @@ const AdminPresaleComponent = () => {
         </Flex>
       </Box>
 
-      {/* Contributions Breakdown */}
+
+
+
+
       <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg" mb={10}>
         <Text fontSize="lg" fontWeight="bold" mb={4}>Contributions Summary</Text>
-
 
         <Flex justifyContent="space-between" mb={2}>
           <Text>ETH Balance in Contract:</Text>
@@ -350,7 +354,10 @@ const AdminPresaleComponent = () => {
         </Flex>
       </Box>
 
-      {/* Admin Controls Section */}
+
+
+
+
       <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg">
         <Text fontSize="lg" fontWeight="bold" mb={4}>Admin Controls</Text>
 
@@ -368,8 +375,10 @@ const AdminPresaleComponent = () => {
         <Button colorScheme="blue" mb={4} onClick={handleEnableClaim} isLoading={isLoading} isDisabled={isClaimEnabled || !isPresaleSuccessful}>
           Enable Claim
         </Button>
+        <Text fontSize="sm" mt={2}>Step 4: Add Liquidity to Exchange and Announce Live Contract as Desired.</Text>
 
-        <Text fontSize="lg" mt={6} color="red.500" fontWeight="bold">Warning: Proceed with caution!</Text>
+
+        <Text fontSize="lg" mt={12} color="red.500" fontWeight="bold">Warning: Proceed with caution!</Text>
 
         <Text fontSize="sm" mb={2}>If the presale fails, click "Cancel Presale" to allow refunds.</Text>
         <Button colorScheme="red" mb={4} onClick={handleCancelPresale} isLoading={isLoading} isDisabled={isPresaleCancelled || isPresaleSuccessful}>
@@ -380,6 +389,7 @@ const AdminPresaleComponent = () => {
         <Button colorScheme="orange" mb={4} onClick={handleWithdrawRemainingTokens} isLoading={isLoading} isDisabled={!isPresaleSuccessful || isPresaleCancelled}>
           Withdraw Remaining Tokens
         </Button>
+
       </Box>
     </Flex>
   </Box>

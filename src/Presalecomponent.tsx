@@ -1,36 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Flex, Text, Button, Progress, Input, Image, InputGroup, InputLeftElement, Tabs, TabList,
-  TabPanels, Tab, TabPanel, useToast, Spinner
+  TabPanels, Tab, TabPanel, useToast
 } from '@chakra-ui/react';
-import { ethers } from 'ethers';
+import { ethers, Contract } from 'ethers';
 import { useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react';
 import presaleAbi from './Abi/presaleAbi.json';
-const USDT_ADDRESS = import.meta.env.VITE_USDT_ADDRESS;
-const PRESALE_CONTRACT_ADDRESS = import.meta.env.VITE_PRESALE_CONTRACT_ADDRESS;
-const PRESALE_TOKEN_ADDRESS = import.meta.env.VITE_PRESALE_TOKEN_ADDRESS;
-const targetDate = new Date(import.meta.env.VITE_TARGET_DATE);
 
+const USDT_ADDRESS = import.meta.env.VITE_USDT_ADDRESS as string;
+const PRESALE_CONTRACT_ADDRESS = import.meta.env.VITE_PRESALE_CONTRACT_ADDRESS as string;
+const PRESALE_TOKEN_ADDRESS = import.meta.env.VITE_PRESALE_TOKEN_ADDRESS as string;
+const targetDate = new Date(import.meta.env.VITE_TARGET_DATE as string);
 
-const PresaleComponent = () => {
+const PresaleComponent: React.FC = () => {
+
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  const [ethAmount, setEthAmount] = useState('');
-  const [usdtAmount, setUsdtAmount] = useState('');
-  const [ethPrice, setEthPrice] = useState(null);
-  const [contract, setContract] = useState(null);
-  const [isClaimEnabled, setIsClaimEnabled] = useState(false);
-  const [usdtApproval, setUsdtApproval] = useState(false);
-  const [ethBalance, setEthBalance] = useState('0');
-  const [usdtBalance, setUsdtBalance] = useState('0');
-  const [ethBalanceInUSD, setEthBalanceInUSD] = useState('0'); // ETH balance in USD
-  const [ethContribution, setEthContribution] = useState('0');
-  const [usdtContribution, setUsdtContribution] = useState('0');
-  const [totalContributionsUSD, setTotalContributionsUSD] = useState('0');
-  const [totalTokensOffered, setTotalTokensOffered] = useState('0');
-  const [softCapUSD, setSoftCapUSD] = useState('0');
+  const [ethAmount, setEthAmount] = useState<string>('');
+  const [usdtAmount, setUsdtAmount] = useState<string>('');
+  const [ethPrice, setEthPrice] = useState<number | null>(null);
+  const [contract, setContract] = useState<Contract | null>(null);
+  const [isClaimEnabled, setIsClaimEnabled] = useState<boolean>(false);
+  const [usdtApproval, setUsdtApproval] = useState<boolean>(false);
+  const [ethBalance, setEthBalance] = useState<string>('0');
+  const [usdtBalance, setUsdtBalance] = useState<string>('0');
+  const [ethBalanceInUSD, setEthBalanceInUSD] = useState<string>('0');
+  const [ethContribution, setEthContribution] = useState<string>('0');
+  const [usdtContribution, setUsdtContribution] = useState<string>('0');
+  const [totalContributionsUSD, setTotalContributionsUSD] = useState<string>('0');
+  const [totalTokensOffered, setTotalTokensOffered] = useState<string>('0');
+  const [softCapUSD, setSoftCapUSD] = useState<string>('0');
   const toast = useToast();
 
-  const targetDate = new Date('2024-11-05T00:00:00');
   const { isConnected, address } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
 
@@ -50,17 +50,14 @@ const PresaleComponent = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Initialize the contract and fetch ETH price, balances, contributions, claim status
   const initContract = async () => {
-    if (walletProvider && isConnected) {
-      console.log("Initializing contract...");
-      const provider = new ethers.BrowserProvider(walletProvider);
+    if (walletProvider && isConnected && address) {
+      const provider = new ethers.BrowserProvider(walletProvider as any);
       const signer = await provider.getSigner();
 
       try {
         const presaleContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, presaleAbi, signer);
         setContract(presaleContract);
-        console.log("Contract initialized:", presaleContract);
 
         await fetchClaimStatus(presaleContract);
         await fetchEthPrice(presaleContract);
@@ -75,53 +72,46 @@ const PresaleComponent = () => {
     }
   };
 
-  // Fetch ETH price and balances
-  const fetchBalances = async (provider, signer) => {
+  const fetchBalances = async (provider: ethers.BrowserProvider, signer: ethers.JsonRpcSigner) => {
+    if (!address) return;
     try {
       const ethBalance = await provider.getBalance(address);
       const formattedEthBalance = ethers.formatEther(ethBalance);
-      console.log("ETH Balance (ETH):", formattedEthBalance);
       setEthBalance(parseFloat(formattedEthBalance).toFixed(5));
 
       if (ethPrice && !isNaN(ethPrice)) {
-        const ethBalanceInUSD = (parseFloat(formattedEthBalance) * parseFloat(ethPrice)).toFixed(2);
+        const ethBalanceInUSD = (parseFloat(formattedEthBalance) * ethPrice).toFixed(2);
         setEthBalanceInUSD(ethBalanceInUSD);
       }
 
       const usdtContract = new ethers.Contract(USDT_ADDRESS, ['function balanceOf(address) view returns (uint256)'], signer);
       const usdtBalance = await usdtContract.balanceOf(address);
-      console.log("USDT Balance:", usdtBalance.toString());
       setUsdtBalance(parseFloat(ethers.formatUnits(usdtBalance, 6)).toFixed(5));
     } catch (error) {
       console.error("Error fetching balances:", error);
     }
   };
 
-  // Fetch ETH price
-  const fetchEthPrice = async (contract) => {
+  const fetchEthPrice = async (contract: Contract) => {
     try {
       const price = await contract.getLatestETHPrice();
       const formattedPrice = ethers.formatUnits(price, 18);
-      setEthPrice(formattedPrice);
-      console.log(`ETH Price in USD: ${formattedPrice}`);
+      setEthPrice(parseFloat(formattedPrice));
     } catch (error) {
       console.error("Error fetching ETH price:", error);
     }
   };
 
-  // Fetch claim status
-  const fetchClaimStatus = async (contract) => {
+  const fetchClaimStatus = async (contract: Contract) => {
     try {
       const claimStatus = await contract.claimEnabled();
       setIsClaimEnabled(claimStatus);
-      console.log(`Claim Enabled: ${claimStatus}`);
     } catch (error) {
       console.error('Error fetching claim status:', error);
     }
   };
 
-  // Fetch user contributions for ETH and USDT
-  const fetchUserContributions = async (contract) => {
+  const fetchUserContributions = async (contract: Contract) => {
     if (!address) return;
     try {
       const ethContrib = await contract.ethContributions(address);
@@ -131,26 +121,18 @@ const PresaleComponent = () => {
       setEthContribution(parseFloat(ethers.formatEther(ethContrib)).toFixed(5));
       setUsdtContribution(parseFloat(ethers.formatUnits(usdtContrib, 6)).toFixed(5));
       setTotalContributionsUSD(parseFloat(ethers.formatUnits(totalContribUSD, 6)).toFixed(2));
-
-      console.log(`ETH Contribution: ${ethContrib}`);
-      console.log(`USDT Contribution: ${usdtContrib}`);
-      console.log(`Total Contributions USD: ${totalContribUSD}`);
     } catch (error) {
       console.error('Error fetching contributions:', error);
     }
   };
 
-  // Fetch presale details (total tokens offered, soft cap)
-  const fetchPresaleDetails = async (contract) => {
+  const fetchPresaleDetails = async (contract: Contract) => {
     try {
       const totalTokens = await contract.totalTokensOfferedPresale();
       const softCap = await contract.softCapUSD();
 
-      setTotalTokensOffered(parseFloat(ethers.formatUnits(totalTokens, 18)));
-      setSoftCapUSD(parseFloat(ethers.formatUnits(softCap, 6)));
-
-      console.log(`Total Tokens Offered: ${totalTokens}`);
-      console.log(`Soft Cap: ${softCap}`);
+      setTotalTokensOffered(ethers.formatUnits(totalTokens, 18));
+      setSoftCapUSD(ethers.formatUnits(softCap, 6));
     } catch (error) {
       console.error('Error fetching presale details:', error);
     }
@@ -164,12 +146,11 @@ const PresaleComponent = () => {
       if (isConnected) {
         initContract();
       }
-    }, 8000); // Update every 8 seconds
+    }, 15000);
 
     return () => clearInterval(interval);
   }, [walletProvider, isConnected]);
 
-  // Handle ETH contribution
   const handleContributeETH = async () => {
     if (!contract) return;
     try {
@@ -183,7 +164,7 @@ const PresaleComponent = () => {
         isClosable: true,
         position: "top-right",
       });
-      await fetchUserContributions(contract); // Refresh contributions
+      await fetchUserContributions(contract);
     } catch (error) {
       console.error('ETH Contribution Failed:', error);
       toast({
@@ -197,26 +178,18 @@ const PresaleComponent = () => {
     }
   };
 
-  // Handle USDT approval
   const approveUSDT = async () => {
-    if (!walletProvider || !contract) {
-      console.error('Wallet provider or contract is missing.');
-      return;
-    }
+    if (!walletProvider || !contract) return;
 
     try {
-      const provider = new ethers.BrowserProvider(walletProvider);
+      const provider = new ethers.BrowserProvider(walletProvider as any);
       const signer = await provider.getSigner();
-
-      const usdtContract = new ethers.Contract(USDT_ADDRESS, [
-        'function approve(address spender, uint256 amount) public returns (bool)',
-      ], signer);
-
+      const usdtContract = new ethers.Contract(USDT_ADDRESS, ['function approve(address spender, uint256 amount) public returns (bool)'], signer);
       const approvalAmount = ethers.MaxUint256;
+
       const tx = await usdtContract.approve(PRESALE_CONTRACT_ADDRESS, approvalAmount);
       await tx.wait();
       setUsdtApproval(true);
-      console.log('USDT Approved');
       toast({
         title: "USDT Approval Successful",
         description: `You have successfully approved USDT.`,
@@ -238,16 +211,11 @@ const PresaleComponent = () => {
     }
   };
 
-  // Handle USDT contribution
   const handleContributeUSDT = async () => {
-    if (!contract || usdtAmount === '' || !usdtApproval) {
-      console.error('USDT not approved');
-      return;
-    }
+    if (!contract || usdtAmount === '' || !usdtApproval) return;
     try {
-      const tx = await contract.contributeWithUSDT(ethers.parseUnits(usdtAmount, 6)); // USDT is 6 decimal places
+      const tx = await contract.contributeWithUSDT(ethers.parseUnits(usdtAmount, 6));
       await tx.wait();
-      console.log('USDT Contribution Successful');
       toast({
         title: "USDT Contribution Successful",
         description: `You contributed ${usdtAmount} USDT.`,
@@ -256,7 +224,7 @@ const PresaleComponent = () => {
         isClosable: true,
         position: "top-right",
       });
-      await fetchUserContributions(contract); // Refresh contributions
+      await fetchUserContributions(contract);
     } catch (error) {
       console.error('USDT Contribution Failed:', error);
       toast({
@@ -270,13 +238,11 @@ const PresaleComponent = () => {
     }
   };
 
-  // Handle token claim
   const handleClaimTokens = async () => {
     if (!contract || !isClaimEnabled) return;
     try {
       const tx = await contract.claimTokens();
       await tx.wait();
-      console.log('Tokens Claimed Successfully');
       toast({
         title: "Tokens Claimed",
         description: `You successfully claimed your tokens.`,
@@ -298,12 +264,21 @@ const PresaleComponent = () => {
     }
   };
 
-  // Calculations for total USD contributions and percentages
-  const ethContributionInUSD = ethContribution * (ethPrice || 0);
-  const totalUserContributionUSD = ethContributionInUSD + parseFloat(usdtContribution);
-  const contributionPercentage = totalContributionsUSD > 0 ? (totalUserContributionUSD / totalContributionsUSD) * 100  : 0;
-  const expectedTokens = totalTokensOffered > 0 ? (totalUserContributionUSD / totalContributionsUSD) * totalTokensOffered : 0;
-  const softCapPercentage = softCapUSD > 0 ? (totalContributionsUSD / softCapUSD) * 100 : 0;
+  const ethContributionInUSD = ethContribution && ethPrice ? (parseFloat(ethContribution) * ethPrice) : 0;
+
+  const totalUserContributionUSD = ethContributionInUSD + parseFloat(usdtContribution || '0');
+
+  const contributionPercentage = parseFloat(totalContributionsUSD) > 0
+    ? (totalUserContributionUSD / parseFloat(totalContributionsUSD)) * 100
+    : 0;
+
+  const expectedTokens = parseFloat(totalTokensOffered) > 0
+    ? (totalUserContributionUSD / parseFloat(totalContributionsUSD)) * parseFloat(totalTokensOffered)
+    : 0;
+
+  const softCapPercentage = parseFloat(softCapUSD) > 0
+    ? (parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100
+    : 0;
 
   return (
     <Flex
@@ -330,12 +305,12 @@ const PresaleComponent = () => {
           Total Tokens Offered: {parseInt(totalTokensOffered).toLocaleString()}
         </Text>
         <Text fontSize="3xl" fontWeight="bold" textAlign="center">Required Softcap: ${softCapUSD} USD</Text>
-        <Progress value={totalContributionsUSD / softCapUSD * 100} size="lg" mx="auto" maxW="250px" colorScheme="green" borderRadius="md" mt={4} />
+        <Progress value={(parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100} size="lg" mx="auto" maxW="250px" colorScheme="green" borderRadius="md" mt={4} />
         <Text fontSize="xl" textAlign="center" mt={2}>
           Current Contributions ${parseFloat(totalContributionsUSD).toFixed(2).toLocaleString()} / ${parseFloat(softCapUSD).toFixed(2).toLocaleString()} USD
         </Text>
         <Text fontSize="xl" mt={2}>
-          Progress: {(totalContributionsUSD / softCapUSD * 100).toFixed(2)}%
+          Progress: {((parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100).toFixed(2)}%
         </Text>
       </Box>
 
@@ -385,7 +360,6 @@ const PresaleComponent = () => {
             </Flex>
           </TabPanel>
 
-          {/* Tab 2: Contribute with USDT */}
           <TabPanel>
             <Flex flexDirection="column" alignItems="center">
               <Box width="100%" mb={4}>
@@ -407,7 +381,6 @@ const PresaleComponent = () => {
                 </InputGroup>
               </Box>
 
-              {/* USDT Balance */}
               <Text mt={2} mb={4} textAlign="right" fontSize="sm" width="100%">
                 USDT Balance: {usdtBalance} USDT
               </Text>
@@ -436,7 +409,6 @@ const PresaleComponent = () => {
             </Flex>
           </TabPanel>
 
-          {/* Tab 3: Claim Tokens */}
           <TabPanel>
             <Flex flexDirection="column" alignItems="center">
               <Button
@@ -453,8 +425,7 @@ const PresaleComponent = () => {
           </TabPanel>
         <TabPanel>
 
-              {/* Display user contributions */}
-              <Box width="100%" mt={10} p={4} borderRadius="md" bg="gray.800" boxShadow="lg">
+              <Box width="100%" mt={10} p={4} borderRadius="md"  boxShadow="lg">
                 <Text fontSize="lg" fontWeight="bold" mb={4} textAlign="center">
                   Your Contributions
                 </Text>

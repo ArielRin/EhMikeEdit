@@ -3,12 +3,10 @@ import { Box, Image, Flex, Text } from '@chakra-ui/react';
 import { css, keyframes } from '@emotion/react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link as ChakraLink } from '@chakra-ui/react';
-import Footer from './Components/Footer/Footer';
+import Footer from './Components/Footer/Footer'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitter as faXTwitter, faTelegram } from '@fortawesome/free-brands-svg-icons';
 import { faGlobe, faChartLine } from '@fortawesome/free-solid-svg-icons';
-import ViewPresale from './Presalecomponent';
-import Presalecomponent from './Presalecomponent';
 
 const imagePaths = ['/images/logobwb.png'];
 const imagePathsBabyDoge = ['/images/logobwb.png'];
@@ -97,59 +95,12 @@ const NewPage = () => {
                   <Image src={currentImageBabyDoge} alt="BabyDoge" mx="auto" width="40%" minW="250px" mt="28px" borderRadius="2xl" />
                 </RouterLink>
               </Box>
-
-
-
-              <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff" bg="rgba(0, 0, 0, 0.61)" bgImage="/images/b2.png" bgSize="cover" bgPosition="left">
-                <RouterLink to="/introBABY">
-                  <Image src="/images/babytextlogo.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
-                  <Image src="/images/nobase.png" alt="header" mx="auto" width="20%" minW="180px" mb={2} />
-                  <Flex justifyContent="center" flexWrap="wrap">
-                    <Text mt="10px" width="60%" textAlign="center" fontSize="lg" fontWeight="normal">
-                      Click to Enter Site
-                    </Text>
-                  </Flex>
-                  <Flex justifyContent="center" flexWrap="wrap">
-                    <Text width="60%" textAlign="center" fontSize="lg" fontWeight="normal">
-                      BABYDOGE on Base Presale Coming soon...
-                    </Text>
-                  </Flex>
-                  <Image src={currentImageBabyDoge} alt="BabyDoge" mx="auto" width="40%" minW="250px" mt="28px" borderRadius="2xl" />
-                </RouterLink>
-              </Box>
-
-
-
-            </Flex>
-            <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
-              <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" bg="rgba(0, 0, 0, 0.61)" border="2px" borderColor="#fff">
-                <RouterLink to="/">
-                  <Text textAlign="center" color="white" fontSize="4xl" fontWeight="bolder">
-                    Presale is Live!
-                  </Text>
-                  <Image src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
-                </RouterLink>
-                <Box textAlign="center" mt={4}>
-                  <Text mb={2}>
-                    Connect your wallet and buy your presale tokens now! Once the presale is over,
-                    you will be able to claim your tokens here by hitting the claim button.
-                  </Text>
-                  <Text mb={2}>
-                    Once all tokens are claimed, you can trade them on Uniswap or HODL for the 2000X that's coming!!!
-                    Good Luck, Diamond Hands Win!!
-                  </Text>
-                  <Text>Have fun!!</Text>
-                </Box>
-              </Box>
             </Flex>
 
+            <Footer />
           </Box>
         </Box>
       </Box>
-
-
-
-      <Footer />
     </>
   );
 };
