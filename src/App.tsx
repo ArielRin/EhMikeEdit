@@ -6,6 +6,7 @@ import Intro from './Intro';
 import IntroBABY from './IntroBABY';
 import Presalecomponent from './Presalecomponent';
 import PresaleAdminPage from './PresaleAdminPage';
+import ContributorList from './Components/ContributorList';
 
 
 
@@ -127,6 +128,7 @@ const modal = createWeb3Modal({
           <Route path="/introbaby" element={<IntroBABY />} />
           <Route path="/presale" element={<Presalecomponent />} />
           <Route path="/adminpresale" element={<PresaleAdminPage />} />
+          <Route path="/list" element={<ContributorList />} />
 
       </Routes>
     </Router>

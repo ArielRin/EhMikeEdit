@@ -3,17 +3,6 @@
 
 
 /*
-token address 0xA716C25e30Af41472bd51C92A643861d4Fa28021
-usdt address 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2
-eth chainlink aggrigator 0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70
-tokens offer for presale 100
-softcapUSD 3
-
-0xE2BEAD99467C2546a137d3a4EFBA3705eE13652C
-*/
-
-
-/*
 Example Parameters:
 so u know what to type out mike
 
@@ -24,16 +13,12 @@ so u know what to type out mike
     softCapUSD:                 2000000000 (2,000 USD with 6 decimals)
 */
 
+// and usdc address 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+
+pragma solidity 0.8.19;
 
 
-pragma solidity ^0.8;
-
-interface IERC20 {
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
-    function transfer(address to, uint256 value) external returns (bool);
-    function balanceOf(address owner) external view returns (uint256);
-    function allowance(address owner, address spender) external view returns (uint256);
-}
+import "@openzeppelin/contracts@4.5.0/token/ERC20/IERC20.sol";
 
 interface Aggregator {
     function latestRoundData()
@@ -59,9 +44,17 @@ contract Presale {
     bool public presaleSuccessful;
     bool public claimEnabled;
     bool public presaleCancelled;
+    bool public presalePaused;
+
+    struct Contributor {
+        address contributorAddress;
+        uint256 totalContributionUSD;
+    }
 
     mapping(address => uint256) public ethContributions;
     mapping(address => uint256) public usdtContributions;
+    Contributor[] public contributors;
+    mapping(address => bool) public isContributor;
 
     event TokensPurchased(address indexed buyer, uint256 amountContributed);
     event TokensClaimed(address indexed claimer, uint256 amountClaimed);
@@ -69,6 +62,7 @@ contract Presale {
     event RefundIssued(address indexed user, uint256 amountRefunded);
     event ClaimEnabled();
     event PresaleCancelled();
+    event PresalePaused(bool paused);
 
     constructor(
         address _presaleTokenAddress,
@@ -86,6 +80,7 @@ contract Presale {
         presaleSuccessful = false;
         claimEnabled = false;
         presaleCancelled = false;
+        presalePaused = false;
     }
 
     modifier onlyOwner() {
@@ -98,39 +93,51 @@ contract Presale {
         _;
     }
 
-    // Fetch ETH price in USD using Chainlink's price feed
+    modifier presaleNotPaused() {
+        require(!presalePaused, "Presale is paused");
+        _;
+    }
+
     function getLatestETHPrice() public view returns (uint256) {
         (, int256 price, , ,) = Aggregator(chainlinkPricefeedEth).latestRoundData();
-        return uint256(price * 10 ** 10); // Convert the price to 18 decimals
+        return uint256(price * 10 ** 10);
     }
 
-    // Convert ETH contribution to USD (in 6 decimals)
     function ethToUSD(uint256 ethAmount) public view returns (uint256) {
-        uint256 ethPriceInUSD = getLatestETHPrice(); // Get ETH/USD price in 18 decimals
-        uint256 ethInUSD = (ethAmount * ethPriceInUSD) / 1 ether; // Convert ETH to USD equivalent (still 18 decimals)
+        uint256 ethPriceInUSD = getLatestETHPrice();
+        uint256 ethInUSD = (ethAmount * ethPriceInUSD) / 1 ether;
 
-        // Convert the 18 decimal ETH value to a 6 decimal USD value for totalContributionsUSD
-        return ethInUSD / 1e12; // Scale down to 6 decimals for proper handling with USDT
+        return ethInUSD / 1e12;
     }
 
-    // Convert USDT (6 decimals) to USD (6 decimals)
     function usdtToUSD(uint256 usdtAmount) public pure returns (uint256) {
-        return usdtAmount; // USDT is already in 6 decimals, so we return it directly
+        return usdtAmount;
     }
 
-    // Allow users to contribute ETH
-    function contributeWithETH() external payable presaleNotCancelled {
+    function contributeWithETH() external payable presaleNotCancelled presaleNotPaused {
         require(msg.value > 0, "Must contribute ETH");
 
-        uint256 contributionInUSD = ethToUSD(msg.value); // Convert ETH to USD (scaled to 6 decimals)
+        uint256 contributionInUSD = ethToUSD(msg.value);
         ethContributions[msg.sender] += msg.value;
-        totalContributionsUSD += contributionInUSD; // Add USD-equivalent contribution (6 decimals)
+        totalContributionsUSD += contributionInUSD;
+
+        if (!isContributor[msg.sender]) {
+            contributors.push(Contributor(msg.sender, contributionInUSD));
+            isContributor[msg.sender] = true;
+        } else {
+            // Update existing contributor's USD contribution
+            for (uint i = 0; i < contributors.length; i++) {
+                if (contributors[i].contributorAddress == msg.sender) {
+                    contributors[i].totalContributionUSD += contributionInUSD;
+                    break;
+                }
+            }
+        }
 
         emit TokensPurchased(msg.sender, contributionInUSD);
     }
 
-    // Allow users to contribute USDT (already in 6 decimals)
-    function contributeWithUSDT(uint256 usdtAmount) external presaleNotCancelled {
+    function contributeWithUSDT(uint256 usdtAmount) external presaleNotCancelled presaleNotPaused {
         require(usdtAmount > 0, "Must contribute USDT");
 
         uint256 allowance = IERC20(USDTAddress).allowance(msg.sender, address(this));
@@ -138,25 +145,34 @@ contract Presale {
 
         IERC20(USDTAddress).transferFrom(msg.sender, address(this), usdtAmount);
         usdtContributions[msg.sender] += usdtAmount;
-        totalContributionsUSD += usdtToUSD(usdtAmount); // Add USDT directly to total contributions (6 decimals)
+        totalContributionsUSD += usdtToUSD(usdtAmount);
+
+        if (!isContributor[msg.sender]) {
+            contributors.push(Contributor(msg.sender, usdtAmount));
+            isContributor[msg.sender] = true;
+        } else {
+            for (uint i = 0; i < contributors.length; i++) {
+                if (contributors[i].contributorAddress == msg.sender) {
+                    contributors[i].totalContributionUSD += usdtAmount;
+                    break;
+                }
+            }
+        }
 
         emit TokensPurchased(msg.sender, usdtAmount);
     }
 
-    // End the presale and mark as successful if soft cap (in USD) is reached
     function endPresale() external onlyOwner presaleNotCancelled {
         require(totalContributionsUSD >= softCapUSD, "Soft cap in USD not reached");
         presaleSuccessful = true;
         emit PresaleSuccessful(totalContributionsUSD, totalTokensOfferedPresale);
     }
 
-    // Cancel the presale and allow users to get refunds
     function cancelPresale() external onlyOwner presaleNotCancelled {
         presaleCancelled = true;
         emit PresaleCancelled();
     }
 
-    // Manually enable the claim process (owner must call this when ready)
     function enableClaimTokens() external onlyOwner {
         require(presaleSuccessful, "Presale must be successful to enable claims");
         require(!presaleCancelled, "Cannot enable claims, presale was cancelled");
@@ -164,39 +180,31 @@ contract Presale {
         emit ClaimEnabled();
     }
 
-    // Claim tokens based on contribution percentage
     function claimTokens() external {
         require(presaleSuccessful, "Presale not successful");
         require(claimEnabled, "Token claim is not enabled");
         require(!presaleCancelled, "Presale was cancelled, no tokens to claim");
 
-        // Calculate user's total contribution in USD
-        uint256 userTotalContributionUSD = ethToUSD(ethContributions[msg.sender]) + usdtContributions[msg.sender]; // ETH is scaled to 6 decimals, USDT is 6 decimals
+        uint256 userTotalContributionUSD = ethToUSD(ethContributions[msg.sender]) + usdtContributions[msg.sender];
         require(userTotalContributionUSD > 0, "No contributions from user");
 
-        // Calculate the percentage of the total contributions made by the user
-        uint256 userSharePercentage = (userTotalContributionUSD * 1e6) / totalContributionsUSD; // Use 6 decimals for user share percentage
+        uint256 userSharePercentage = (userTotalContributionUSD * 1e6) / totalContributionsUSD;
 
-        // Calculate the number of tokens the user is entitled to
         uint256 userTokenAmount = (totalTokensOfferedPresale * userSharePercentage) / 1e6;
 
         require(userTokenAmount > 0, "No tokens to claim");
 
-        // Transfer tokens to the user
         IERC20(presaleTokenAddress).transfer(msg.sender, userTokenAmount);
 
-        // Reset user's contributions to 0 after claiming
         ethContributions[msg.sender] = 0;
         usdtContributions[msg.sender] = 0;
 
         emit TokensClaimed(msg.sender, userTokenAmount);
     }
 
-    // Refund contributions if the presale is cancelled or soft cap is not reached
     function refund() external {
         require(presaleCancelled || totalContributionsUSD < softCapUSD, "No refunds, presale successful");
 
-        // Refund ETH contributions
         uint256 ethContribution = ethContributions[msg.sender];
         if (ethContribution > 0) {
             ethContributions[msg.sender] = 0;
@@ -204,7 +212,6 @@ contract Presale {
             emit RefundIssued(msg.sender, ethContribution);
         }
 
-        // Refund USDT contributions
         uint256 usdtContribution = usdtContributions[msg.sender];
         if (usdtContribution > 0) {
             usdtContributions[msg.sender] = 0;
@@ -213,7 +220,6 @@ contract Presale {
         }
     }
 
-    // Owner can withdraw the remaining tokens after the presale ends
     function withdrawRemainingTokens() external onlyOwner {
         require(presaleSuccessful, "Presale not successful");
         require(!presaleCancelled, "Presale was cancelled, no withdrawal");
@@ -221,14 +227,26 @@ contract Presale {
         IERC20(presaleTokenAddress).transfer(owner, remainingTokens);
     }
 
-    // Owner can withdraw the total contributions after the presale is successful
     function withdrawContributions() external onlyOwner {
         require(presaleSuccessful, "Presale not successful");
         require(!presaleCancelled, "Presale was cancelled, no withdrawal");
 
-        payable(owner).transfer(address(this).balance); // Withdraw ETH contributions
+        payable(owner).transfer(address(this).balance);
 
         uint256 usdtBalance = IERC20(USDTAddress).balanceOf(address(this));
-        IERC20(USDTAddress).transfer(owner, usdtBalance); // Withdraw USDT contributions
+        IERC20(USDTAddress).transfer(owner, usdtBalance);
+    }
+
+    function togglePresalePause() external onlyOwner {
+        presalePaused = !presalePaused;
+        emit PresalePaused(presalePaused);
+    }
+
+    function presaleTokenBalance() public view returns (uint256) {
+        return IERC20(presaleTokenAddress).balanceOf(address(this));
+    }
+
+    function getContributors() external view returns (Contributor[] memory) {
+        return contributors;
     }
 }

@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Flex, Image, Text, Button, Progress, useToast
+  Box, Flex, Image, Text, Button, Progress, useToast, Tabs, TabList, TabPanels, Tab, TabPanel,
 } from '@chakra-ui/react';
+
+
+
 import { ethers, Contract } from 'ethers';
 import { useWeb3ModalProvider } from '@web3modal/ethers/react';
 import presaleAbi from './Abi/presaleAbi.json';
 
-const USDT_ADDRESS = import.meta.env.VITE_USDT_ADDRESS as string;
+import ContributorList from './Components/ContributorList';
+
+
+const USDC_ADDRESS = import.meta.env.VITE_USDC_ADDRESS as string;
 const PRESALE_CONTRACT_ADDRESS = import.meta.env.VITE_PRESALE_CONTRACT_ADDRESS as string;
 const PRESALE_TOKEN_ADDRESS = import.meta.env.VITE_PRESALE_TOKEN_ADDRESS as string;
 const targetDate = new Date(import.meta.env.VITE_TARGET_DATE as string);
@@ -119,7 +125,7 @@ const AdminPresaleComponent: React.FC = () => {
       const ethBalance = await provider.getBalance(PRESALE_CONTRACT_ADDRESS);
       setEthBalance(ethers.formatEther(ethBalance));
 
-      const usdtContract = new ethers.Contract(USDT_ADDRESS, ['function balanceOf(address) view returns (uint256)'], provider);
+      const usdtContract = new ethers.Contract(USDC_ADDRESS, ['function balanceOf(address) view returns (uint256)'], provider);
       const usdtBalance = await usdtContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
       setUsdtBalance(ethers.formatUnits(usdtBalance, 6));
     } catch (error) {
@@ -133,6 +139,7 @@ const AdminPresaleComponent: React.FC = () => {
     try {
       const tx = await contract.enableClaimTokens();
       await tx.wait();
+      setIsClaimEnabled(true);
       toast({
         title: "Claim Enabled",
         description: "Claim has been successfully enabled.",
@@ -162,6 +169,7 @@ const AdminPresaleComponent: React.FC = () => {
     try {
       const tx = await contract.endPresale();
       await tx.wait();
+      setIsPresaleSuccessful(true);  // Mark presale as successful
       toast({
         title: "Presale Ended",
         description: "Presale has been successfully ended.",
@@ -191,6 +199,7 @@ const AdminPresaleComponent: React.FC = () => {
     try {
       const tx = await contract.cancelPresale();
       await tx.wait();
+      setIsPresaleCancelled(true);  // Mark presale as cancelled
       toast({
         title: "Presale Cancelled",
         description: "Presale has been successfully cancelled.",
@@ -279,121 +288,206 @@ const AdminPresaleComponent: React.FC = () => {
   }, [walletProvider]);
 
   return (
-    <Box position="relative" flex={1} p={0} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
+   <Box position="relative" flex={1} p={0} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
+     <Flex flexDirection="column" p={6} borderRadius="xl" boxShadow="xl" color="white" width="100%" maxW="800px" mx="auto">
+       <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg" mb={10}>
+         <Image mb={8} src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" />
+         <Box mb={8} textAlign="center" mx="auto">
+           <w3m-button />
+         </Box>
+         <Text fontSize="lg" fontWeight="bold" mb={4}>
+           Presale Overview
+         </Text>
 
-    <Flex flexDirection="column" p={6} borderRadius="xl" boxShadow="xl" color="white" width="100%" maxW="800px" mx="auto">
-      <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg" mb={10}>
-        <Image mb={8} src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" />
-        <Box textAlign="center" mx="auto">
-          <w3m-button />
-        </Box>
-        <Text fontSize="lg" fontWeight="bold" mb={4}>Presale Overview</Text>
+         <Flex justifyContent="space-between" mb={2}>
+           <Text>Current ETH Price:</Text>
+           <Text>${ethPrice ? parseFloat(ethPrice).toFixed(2) : "0.00"}</Text>
+         </Flex>
 
-        <Flex justifyContent="space-between" mb={2}>
-          <Text>Current ETH Price:</Text>
-          <Text>${ethPrice ? parseFloat(ethPrice).toFixed(2) : '0.00'}</Text>
-        </Flex>
+         <Flex justifyContent="space-between" mb={2}>
+           <Text>Total Contributions:</Text>
+           <Text>${parseFloat(totalContributionsUSD).toLocaleString()} USD</Text>
+         </Flex>
 
-        <Flex justifyContent="space-between" mb={2}>
-          <Text>Total Contributions:</Text>
-          <Text>${parseFloat(totalContributionsUSD).toLocaleString()} USD</Text>
-        </Flex>
+         <Flex justifyContent="space-between" mb={2}>
+           <Text>Soft Cap:</Text>
+           <Text>${parseFloat(softCapUSD).toFixed(2)} USD</Text>
+         </Flex>
 
-        <Flex justifyContent="space-between" mb={2}>
-          <Text>Soft Cap:</Text>
-          <Text>${parseFloat(softCapUSD).toFixed(2)} USD</Text>
-        </Flex>
+         <Flex justifyContent="space-between" mb={2}>
+           <Text>Total Tokens Offered:</Text>
+           <Text>{parseInt(totalTokensOffered).toLocaleString()} Tokens</Text>
+         </Flex>
 
-        <Flex justifyContent="space-between" mb={2}>
-          <Text>Total Tokens Offered:</Text>
-          <Text>{parseInt(totalTokensOffered).toLocaleString()} Tokens</Text>
-        </Flex>
+         <Flex justifyContent="space-between" alignItems="center" mb={4}>
+           <Text>Progress:</Text>
+           <Box width="60%">
+             <Progress value={(parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100} colorScheme="green" borderRadius="md" width="60%" />
+           </Box>
+           <Text>{((parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100).toFixed(2)}%</Text>
+         </Flex>
 
-        <Flex justifyContent="space-between" alignItems="center" mb={4}>
-          <Text>Progress:</Text>
-          <Box width="60%">
-            <Progress value={(parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100} colorScheme="green" borderRadius="md" />
-          </Box>
-          <Text>{((parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100).toFixed(2)}%</Text>
-        </Flex>
+         <Flex justifyContent="space-between" mb={2}>
+           <Text>Presale Successful:</Text>
+           <Text>{isPresaleSuccessful ? "Yes" : "No"}</Text>
+         </Flex>
 
-        <Flex fontSize="sm" justifyContent="space-between" mb={2}>
-          <Text>Token Address:</Text>
-        </Flex>
-        <Flex fontSize="sm" justifyContent="space-between" mb={2}>
-          <Text>{PRESALE_TOKEN_ADDRESS}</Text>
-        </Flex>
+         <Flex justifyContent="space-between" mb={2}>
+           <Text>Claim Enabled:</Text>
+           <Text>{isClaimEnabled ? "Yes" : "No"}</Text>
+         </Flex>
 
-        <Flex fontSize="sm" justifyContent="space-between" mb={2}>
-          <Text>Presale Contract Address:</Text>
-        </Flex>
-        <Flex fontSize="sm" justifyContent="space-between" mb={2}>
-          <Text>{PRESALE_CONTRACT_ADDRESS}</Text>
-        </Flex>
-      </Box>
+         <Flex justifyContent="space-between" mb={2}>
+           <Text>Presale Cancelled:</Text>
+           <Text>{isPresaleCancelled ? "Yes" : "No"}</Text>
+         </Flex>
 
+         <Flex fontSize="sm" justifyContent="space-between" mb={2}>
+           <Text>Token Address:</Text>
+           <Text fontSize="10px" mb={2}>{PRESALE_TOKEN_ADDRESS}</Text>
+         </Flex>
 
+         <Flex fontSize="sm" justifyContent="space-between" mb={2}>
+           <Text>Presale Contract:</Text>
+           <Text fontSize="10px" mb={2}>{PRESALE_CONTRACT_ADDRESS}</Text>
+         </Flex>
+         <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg" mb={10}>
+           <Text fontSize="lg" fontWeight="bold" mb={4}>
+             Contributions Summary
+           </Text>
 
+           <Flex justifyContent="space-between" mb={2}>
+             <Text>ETH Balance in Contract:</Text>
+             <Text>{parseFloat(ethBalance).toFixed(5)} ETH</Text>
+           </Flex>
 
+           <Flex justifyContent="space-between" mb={2}>
+             <Text>USDC Balance in Contract:</Text>
+             <Text>{usdtBalance} USDC</Text>
+           </Flex>
+           <Flex justifyContent="space-between" mb={2}>
+             <Text>Total Contribution in USD:</Text>
+             <Text>${parseFloat(totalContributionsUSD).toLocaleString()}</Text>
+           </Flex>
+         </Box>
+       </Box>
 
-      <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg" mb={10}>
-        <Text fontSize="lg" fontWeight="bold" mb={4}>Contributions Summary</Text>
+       <Flex
+         flexDirection="column"
+         alignItems="center"
+         p={6}
+         borderRadius="xl"
+         boxShadow="xl"
+         bg="rgba(0, 0, 0, 0.7)"
+         color="white"
+         width="100%"
+       >
+       <Tabs isFitted variant="enclosed" width="100%">
+         <TabList mb="1em">
+           <Tab>List</Tab>
+           <Tab>Admin Controls</Tab>
+         </TabList>
+         <TabPanels>
 
-        <Flex justifyContent="space-between" mb={2}>
-          <Text>ETH Balance in Contract:</Text>
-          <Text>{parseFloat(ethBalance).toFixed(5)} ETH</Text>
-        </Flex>
+         <TabPanel>
+          <ContributorList/>
+         </TabPanel>
 
-        <Flex justifyContent="space-between" mb={2}>
-          <Text>USDT Balance in Contract:</Text>
-          <Text>{usdtBalance} USDT</Text>
-        </Flex>
-        <Flex justifyContent="space-between" mb={2}>
-          <Text>Total Contribution in USD:</Text>
-          <Text>${parseFloat(totalContributionsUSD).toLocaleString()}</Text>
-        </Flex>
-      </Box>
+           <TabPanel>
+             <Box  borderRadius="md" boxShadow="lg">
+               <Text fontSize="lg" fontWeight="bold" mb={4}>
+                 Admin Controls
+               </Text>
 
+               <Text fontSize="sm" mb={2}>
+                 Step 1: On successful presale, click "End Presale" to finalize.
+               </Text>
+               <Button
+                 colorScheme="blue"
+                 mb={4}
+                 onClick={handleEndPresale}
+                 isLoading={isLoading}
+                 isDisabled={isPresaleSuccessful || isPresaleCancelled}
+               >
+                 End Presale
+               </Button>
 
+               <Text fontSize="sm" mb={2}>
+                 Step 2: Withdraw the total contributions after a successful presale.
+               </Text>
+               <Button
+                 colorScheme="yellow"
+                 mb={4}
+                 onClick={handleWithdrawContributions}
+                 isLoading={isLoading}
+                 isDisabled={!isPresaleSuccessful && !isPresaleCancelled}
+               >
+                 Withdraw Contributions
+               </Button>
 
+               <Text fontSize="sm" mb={2}>
+                 Step 3: Send the {parseInt(totalTokensOffered).toLocaleString()} Presale Tokens to the Presale Contract address.
+               </Text>
+               <Text fontSize="10px" mb={2}>
+                 {PRESALE_CONTRACT_ADDRESS}
+               </Text>
 
+               <Text fontSize="sm" mb={2}>
+                 Step 4: Enable "Claim Tokens" to allow participants to claim tokens.
+               </Text>
+               <Button
+                 colorScheme="blue"
+                 mb={4}
+                 onClick={handleEnableClaim}
+                 isLoading={isLoading}
+                 isDisabled={isClaimEnabled || !isPresaleSuccessful}
+               >
+                 Enable Claim
+               </Button>
 
-      <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg">
-        <Text fontSize="lg" fontWeight="bold" mb={4}>Admin Controls</Text>
+               <Text fontSize="sm" mb={2}>
+                 Step 5: Add the value to the liquidity in the correct ratio to ensure contributors get the correct value of tokens purchase.
+               </Text>
 
-        <Text fontSize="sm" mb={2}>Step 1: On successful presale, click "End Presale" to finalize.</Text>
-        <Button colorScheme="blue" mb={4} onClick={handleEndPresale} isLoading={isLoading} isDisabled={isPresaleSuccessful || isPresaleCancelled}>
-          End Presale
-        </Button>
+               <Text fontSize="lg" mt={12} color="red.500" fontWeight="bold">
+                 Warning: Proceed with caution!
+               </Text>
 
-        <Text fontSize="sm" mb={2}>Step 2: Withdraw the total contributions after a successful presale.</Text>
-        <Button colorScheme="yellow" mb={4} onClick={handleWithdrawContributions} isLoading={isLoading} isDisabled={!isPresaleSuccessful || isPresaleCancelled}>
-          Withdraw Contributions
-        </Button>
+               <Text fontSize="sm" mb={2}>
+                 If the presale fails, click "Cancel Presale" to allow refunds.
+               </Text>
+               <Button
+                 colorScheme="red"
+                 mb={4}
+                 onClick={handleCancelPresale}
+                 isLoading={isLoading}
+                 isDisabled={isPresaleCancelled || isPresaleSuccessful}
+               >
+                 Cancel Presale
+               </Button>
 
-        <Text fontSize="sm" mb={2}>Step 3: Enable "Claim Tokens" to allow participants to claim tokens.</Text>
-        <Button colorScheme="blue" mb={4} onClick={handleEnableClaim} isLoading={isLoading} isDisabled={isClaimEnabled || !isPresaleSuccessful}>
-          Enable Claim
-        </Button>
-        <Text fontSize="sm" mt={2}>Step 4: Add Liquidity to Exchange and Announce Live Contract as Desired.</Text>
+               <Text fontSize="sm" mb={2}>
+                 Withdraw any remaining tokens from the contract.
+               </Text>
+               <Button
+                 colorScheme="orange"
+                 mb={4}
+                 onClick={handleWithdrawRemainingTokens}
+                 isLoading={isLoading}
+                 isDisabled={!isPresaleSuccessful && !isPresaleCancelled}
+               >
+                 Withdraw Remaining Tokens
+               </Button>
+             </Box>
+           </TabPanel>
 
+         </TabPanels>
+       </Tabs>
 
-        <Text fontSize="lg" mt={12} color="red.500" fontWeight="bold">Warning: Proceed with caution!</Text>
-
-        <Text fontSize="sm" mb={2}>If the presale fails, click "Cancel Presale" to allow refunds.</Text>
-        <Button colorScheme="red" mb={4} onClick={handleCancelPresale} isLoading={isLoading} isDisabled={isPresaleCancelled || isPresaleSuccessful}>
-          Cancel Presale
-        </Button>
-
-        <Text fontSize="sm" mb={2}>Withdraw any remaining tokens from the contract.</Text>
-        <Button colorScheme="orange" mb={4} onClick={handleWithdrawRemainingTokens} isLoading={isLoading} isDisabled={!isPresaleSuccessful || isPresaleCancelled}>
-          Withdraw Remaining Tokens
-        </Button>
-
-      </Box>
-    </Flex>
-  </Box>
-  );
+     </Flex>
+     </Flex>
+   </Box>
+ );
 };
 
 export default AdminPresaleComponent;
