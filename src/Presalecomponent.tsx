@@ -10,6 +10,7 @@ import presaleAbi from './Abi/presaleAbi.json';
 const USDT_ADDRESS = import.meta.env.VITE_USDT_ADDRESS as string;
 const PRESALE_CONTRACT_ADDRESS = import.meta.env.VITE_PRESALE_CONTRACT_ADDRESS as string;
 const PRESALE_TOKEN_ADDRESS = import.meta.env.VITE_PRESALE_TOKEN_ADDRESS as string;
+const RPC_URL = import.meta.env.VITE_RPC_URL as string;
 const targetDate = new Date(import.meta.env.VITE_TARGET_DATE as string);
 
 const PresaleComponent: React.FC = () => {
@@ -52,42 +53,39 @@ const PresaleComponent: React.FC = () => {
   }, []);
 
   const initContract = async () => {
-    if (walletProvider && isConnected && address) {
-      const provider = new ethers.BrowserProvider(walletProvider as any);
-      const signer = await provider.getSigner();
+  let provider: ethers.JsonRpcProvider | ethers.BrowserProvider;
+  let signerOrProvider: ethers.JsonRpcSigner | ethers.Provider;
 
-      try {
-        const presaleContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, presaleAbi, signer);
-        setContract(presaleContract);
+  if (isConnected && walletProvider) {
+    provider = new ethers.BrowserProvider(walletProvider as any);
+    signerOrProvider = await provider.getSigner();
+  } else {
+    provider = new ethers.JsonRpcProvider(RPC_URL);
+    signerOrProvider = provider;
+  }
 
-        await fetchClaimStatus(presaleContract);
-        await fetchEthPrice(presaleContract);
-        await fetchPresaleStatus(presaleContract);
-        await fetchBalances(provider, signer);
-        await fetchUserContributions(presaleContract);
-        await fetchPresaleDetails(presaleContract);
-      } catch (error) {
-        console.error("Error initializing contract:", error);
-      }
-    } else {
-      console.error("Wallet provider or connection is missing.");
+  try {
+    const presaleContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, presaleAbi, signerOrProvider);
+    setContract(presaleContract);
+
+    await fetchClaimStatus(presaleContract);
+    await fetchEthPrice(presaleContract);
+    await fetchPresaleStatus(presaleContract);
+    await fetchPresaleDetails(presaleContract);
+
+    // Check if signerOrProvider is a JsonRpcSigner before calling fetchBalances
+    if (isConnected && signerOrProvider instanceof ethers.JsonRpcSigner) {
+      await fetchBalances(provider, signerOrProvider);
+      await fetchUserContributions(presaleContract);
     }
-  };
+  } catch (error) {
+    console.error("Error initializing contract:", error);
+  }
+};
 
-  // New: Fetch presale status
-  const fetchPresaleStatus = async (contract: Contract) => {
-    try {
-      const presaleCancelled = await contract.presaleCancelled();
-      const presaleSuccessful = await contract.presaleSuccessful();
 
-      setIsPresaleCancelled(presaleCancelled);
-      setIsPresaleSuccessful(presaleSuccessful);
-    } catch (error) {
-      console.error('Error fetching presale status:', error);
-    }
-  };
 
-  const fetchBalances = async (provider: ethers.BrowserProvider, signer: ethers.JsonRpcSigner) => {
+  const fetchBalances = async (provider: ethers.JsonRpcProvider | ethers.BrowserProvider, signer: ethers.JsonRpcSigner) => {
     if (!address) return;
     try {
       const ethBalance = await provider.getBalance(address);
@@ -107,24 +105,40 @@ const PresaleComponent: React.FC = () => {
     }
   };
 
-  const fetchEthPrice = async (contract: Contract) => {
+
+
+  // New: Fetch presale status
+  const fetchPresaleStatus = async (contract: Contract) => {
     try {
-      const price = await contract.getLatestETHPrice();
-      const formattedPrice = ethers.formatUnits(price, 18);
-      setEthPrice(parseFloat(formattedPrice));
+      const presaleCancelled = await contract.presaleCancelled();
+      const presaleSuccessful = await contract.presaleSuccessful();
+
+      setIsPresaleCancelled(presaleCancelled);
+      setIsPresaleSuccessful(presaleSuccessful);
     } catch (error) {
-      console.error("Error fetching ETH price:", error);
+      console.error('Error fetching presale status:', error);
     }
   };
 
-  const fetchClaimStatus = async (contract: Contract) => {
-    try {
-      const claimStatus = await contract.claimEnabled();
-      setIsClaimEnabled(claimStatus);
-    } catch (error) {
-      console.error('Error fetching claim status:', error);
-    }
-  };
+
+  const fetchEthPrice = async (contract: Contract) => {
+   try {
+     const price = await contract.getLatestETHPrice();
+     const formattedPrice = ethers.formatUnits(price, 18);
+     setEthPrice(parseFloat(formattedPrice));
+   } catch (error) {
+     console.error("Error fetching ETH price:", error);
+   }
+ };
+
+ const fetchClaimStatus = async (contract: Contract) => {
+   try {
+     const claimStatus = await contract.claimEnabled();
+     setIsClaimEnabled(claimStatus);
+   } catch (error) {
+     console.error('Error fetching claim status:', error);
+   }
+ };
 
   const fetchUserContributions = async (contract: Contract) => {
     if (!address) return;
@@ -154,13 +168,9 @@ const PresaleComponent: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isConnected) {
-      initContract();
-    }
+    initContract();
     const interval = setInterval(() => {
-      if (isConnected) {
-        initContract();
-      }
+      initContract();
     }, 15000);
 
     return () => clearInterval(interval);
@@ -542,7 +552,7 @@ const PresaleComponent: React.FC = () => {
                   <Text>Expected Tokens:</Text>
                   <Text>{expectedTokens.toFixed(2)}</Text>
                 </Flex>
-                
+
               </Box>
             </TabPanel>
           </TabPanels>
