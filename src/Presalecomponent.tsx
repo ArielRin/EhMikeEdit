@@ -345,6 +345,9 @@ const PresaleComponent: React.FC = () => {
 
         <Box textAlign="center" mb={4}>
           <Image src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
+          <Box mt={2} mx="auto" align="center">
+            <w3m-button />
+          </Box>
           <Text fontSize="2xl" fontWeight="bold">Presale ending in</Text>
           <Text fontSize="4xl" mt={2}>
             {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
