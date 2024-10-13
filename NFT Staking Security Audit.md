@@ -1,8 +1,4 @@
-Here's the updated and revised comprehensive security audit for the `NftRewardPoolV2` contract, including the note about IBEP20 and its chain-agnostic considerations.
-
----
-
-### Comprehensive Security Audit for `NftRewardPoolV2` Contract
+# Comprehensive Security Audit for `NftRewardPoolV2` Contract
 
 This audit examines the `NftRewardPoolV2` contract in terms of potential vulnerabilities, logical flaws, gas optimization opportunities, and adherence to best practices. The audit also suggests mitigation strategies for any identified risks.
 
