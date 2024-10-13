@@ -22,6 +22,8 @@ The `NftRewardPoolV2` contract allows users to stake NFTs and earn rewards in th
 ### Audit Overview
 
 - **Contract Name**: `NftRewardPoolV2`
+- **Chain**: `NftRewardPoolV2`
+- **Contract Address**: `NftRewardPoolV2`
 - **Dependencies**:
   - OpenZeppelin Libraries (`Ownable`, `ReentrancyGuard`, `SafeERC20`, `EnumerableSet`, `SafeMath`)
   - `IERC721` (Staked NFTs)
