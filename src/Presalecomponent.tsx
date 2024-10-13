@@ -87,24 +87,28 @@ const PresaleComponent: React.FC = () => {
   };
 
   const fetchBalances = async (signer: ethers.JsonRpcSigner) => {
-    if (!address) return;
-    try {
-      const ethBalance = await signer.getBalance(address);
-      const formattedEthBalance = ethers.formatEther(ethBalance);
-      setEthBalance(parseFloat(formattedEthBalance).toFixed(5));
+  if (!address) return;
+  try {
+    const provider = signer.provider; // Get the provider from the signer
+    if (!provider) throw new Error("Provider not available");
 
-      if (ethPrice && !isNaN(ethPrice)) {
-        const ethBalanceInUSD = (parseFloat(formattedEthBalance) * ethPrice).toFixed(2);
-        setEthBalanceInUSD(ethBalanceInUSD);
-      }
+    const ethBalance = await provider.getBalance(address); // Call getBalance on the provider
+    const formattedEthBalance = ethers.formatEther(ethBalance);
+    setEthBalance(parseFloat(formattedEthBalance).toFixed(5));
 
-      const usdtContract = new ethers.Contract(USDT_ADDRESS, ['function balanceOf(address) view returns (uint256)'], signer);
-      const usdtBalance = await usdtContract.balanceOf(address);
-      setUsdtBalance(parseFloat(ethers.formatUnits(usdtBalance, 6)).toFixed(5));
-    } catch (error) {
-      console.error("Error fetching balances:", error);
+    if (ethPrice && !isNaN(ethPrice)) {
+      const ethBalanceInUSD = (parseFloat(formattedEthBalance) * ethPrice).toFixed(2);
+      setEthBalanceInUSD(ethBalanceInUSD);
     }
-  };
+
+    const usdtContract = new ethers.Contract(USDT_ADDRESS, ['function balanceOf(address) view returns (uint256)'], signer);
+    const usdtBalance = await usdtContract.balanceOf(address);
+    setUsdtBalance(parseFloat(ethers.formatUnits(usdtBalance, 6)).toFixed(5));
+  } catch (error) {
+    console.error("Error fetching balances:", error);
+  }
+};
+
 
   const fetchEthPrice = async (contract: Contract) => {
     try {
@@ -300,251 +304,255 @@ const PresaleComponent: React.FC = () => {
     return () => clearInterval(interval);
   }, [isConnected, walletProvider]);
 
-
-
-    return (
-      <Flex
-        flexDirection="column"
-        alignItems="center"
-        p={6}
-        borderRadius="xl"
-        boxShadow="xl"
-        bg="rgba(0, 0, 0, 0.7)"
-        color="white"
-        width="100%"
-      >
-        {isPresaleCancelled && (
-          <Box textAlign="center" mb={4} bg="red.600" p={4} borderRadius="md">
-            <Text fontSize="xl" fontWeight="bold">Presale Cancelled</Text>
-            <Text fontSize="md">Go to the refund tab to retrieve your contributions.</Text>
-          </Box>
-        )}
-
-        {isPresaleSuccessful && !isPresaleCancelled && (
-          <Box textAlign="center" mb={4} bg="green.600" p={4} borderRadius="md">
-            <Text fontSize="xl" fontWeight="bold">Presale Successful!</Text>
-            <Text fontSize="md">You can now claim your tokens from the claim tab.</Text>
-          </Box>
-        )}
-
+  return (
+    <Flex
+      flexDirection="column"
+      alignItems="center"
+      p={6}
+      borderRadius="xl"
+      boxShadow="xl"
+      bg="rgba(0, 0, 0, 0.7)"
+      color="white"
+      width="100%"
+    >
         <Box textAlign="center" mb={4}>
-          <Image src="images/logobwb.png" alt="header" mx="auto" width="75%" minW="250px" mt="28px" />
+          <Image src="images/logobwb.png" alt="header" mx="auto" width="70%" minW="250px" mt="28px" />
+          <Text fontSize="sm" mb={4} mt={4} color="gray.300">{PRESALE_TOKEN_ADDRESS}</Text>
 
-          <Text fontSize="2xl" fontWeight="bold">Presale ending in</Text>
+        {!isPresaleCancelled && (
+            <>
+          <Text fontSize="2xl" fontWeight="bold">Presale ends in</Text>
           <Text fontSize="4xl" mt={2}>
             {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+
+          </Text>
+          </>
+        )}
+
+          {isPresaleCancelled && (
+            <Box textAlign="center" mb={4} mt={4} bg="red.600" p={4} borderRadius="md">
+              <Text fontSize="2xl" fontWeight="bold">Presale Cancelled</Text>
+              <Text fontSize="md">Go to the refund tab to retrieve your contributions.</Text>
+            </Box>
+          )}
+
+          {isPresaleSuccessful && !isPresaleCancelled && (
+            <Box textAlign="center" mb={4} mt={4} bg="green.600" p={4} borderRadius="md">
+              <Text fontSize="2xl" fontWeight="bold">Presale Successful!</Text>
+              <Text fontSize="md">You can now claim your tokens from the claim tab.</Text>
+            </Box>
+          )}
+          <Text fontSize="lg" fontWeight="bold" textAlign="center">
+            Tokens Available: {parseInt(totalTokensOffered).toLocaleString()}
           </Text>
         </Box>
 
+      {!isPresaleCancelled && (
         <Box width="100%" mb={6}>
-          <Text fontSize="sm" mb={4} color="gray.300">{PRESALE_TOKEN_ADDRESS}</Text>
-          <Text fontSize="xl" fontWeight="bold" textAlign="center">
-            Total Tokens Offered: {parseInt(totalTokensOffered).toLocaleString()}
-          </Text>
+
 
           {softCapPercentage >= 100 ? (
-            <Text fontSize="3xl" fontWeight="bold" textAlign="center" color="green.400">
+            <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="green.400">
               Softcap Reached
             </Text>
           ) : (
-            <Text fontSize="3xl" fontWeight="bold" textAlign="center">Required Softcap: ${softCapUSD} USD</Text>
+            <Text fontSize="2xl" fontWeight="bold" textAlign="center">Required Softcap: ${softCapUSD} USD</Text>
           )}
 
           <Progress value={softCapPercentage} size="lg" mx="auto" maxW="250px" colorScheme="green" borderRadius="md" mt={4} />
-          <Text fontSize="xl" textAlign="center" mt={2}>
+          <Text fontSize="lg" textAlign="center" mt={2}>
             Current Contributions ${parseFloat(totalContributionsUSD).toFixed(2).toLocaleString()} / ${parseFloat(softCapUSD).toFixed(2).toLocaleString()} USD
           </Text>
-          <Text fontSize="xl" mt={2}>
+          <Text fontSize="lg" mt={2}>
             Progress: {softCapPercentage.toFixed(2)}%
           </Text>
         </Box>
+      )}
 
-        <Tabs isFitted variant="enclosed" width="100%">
-          <TabList mb="1em">
-            <Tab>ETH</Tab>
-            <Tab>USDT</Tab>
-            <Tab>{isPresaleCancelled ? 'Refund' : 'Claim'}</Tab>
-            <Tab>Position</Tab>
-          </TabList>
-          <TabPanels>
-            {/* ETH Contribution Panel */}
-            <TabPanel>
-              <Flex flexDirection="column" alignItems="center">
-                <Box width="100%" mb={4}>
-                  <Text mb={2} fontSize="sm">Enter ETH amount</Text>
-                  <InputGroup>
-                    <InputLeftElement height="100%" display="flex" alignItems="center" pointerEvents="none">
-                      <Image src="/images/eth.svg" alt="ETH Icon" boxSize="32px" />
-                    </InputLeftElement>
-                    <Input
-                      bg="white"
-                      color="black"
-                      placeholder="Enter ETH amount"
-                      size="lg"
-                      borderRadius="md"
-                      textAlign="right"
-                      value={ethAmount}
-                      onChange={(e) => setEthAmount(e.target.value)}
-                      disabled={isPresaleCancelled} // Disable input if presale is cancelled
-                    />
-                  </InputGroup>
-                </Box>
-
-                <Text mt={2} mb={4} textAlign="right" fontSize="sm" width="100%">
-                  ETH Balance: {ethBalance} ETH (${parseFloat(ethBalanceInUSD).toFixed(2)} USD)
-                </Text>
-
-                {!isPresaleCancelled && (
-                  <Button
-                    colorScheme="blue"
-                    width="100%"
+      <Tabs isFitted variant="enclosed" width="100%">
+        <TabList mb="1em">
+          <Tab>ETH</Tab>
+          <Tab>USDT</Tab>
+          <Tab>{isPresaleCancelled ? 'Refund' : 'Claim'}</Tab>
+          <Tab>Position</Tab>
+        </TabList>
+        <TabPanels>
+          {/* ETH Contribution Panel */}
+          <TabPanel>
+            <Flex flexDirection="column" alignItems="center">
+              <Box width="100%" mb={4}>
+                <Text mb={2} fontSize="sm">Enter ETH amount</Text>
+                <InputGroup>
+                  <InputLeftElement height="100%" display="flex" alignItems="center" pointerEvents="none">
+                    <Image src="/images/eth.svg" alt="ETH Icon" boxSize="32px" />
+                  </InputLeftElement>
+                  <Input
+                    bg="white"
+                    color="black"
+                    placeholder="Enter ETH amount"
                     size="lg"
-                    borderRadius="xl"
-                    onClick={handleContributeETH}
-                  >
-                    Contribute ETH
-                  </Button>
-                )}
-
-                {isPresaleCancelled && (
-                  <Text color="red.500" fontWeight="bold" textAlign="center" mt={4}>
-                    Presale cancelled, contributions are no longer accepted.
-                  </Text>
-                )}
-              </Flex>
-            </TabPanel>
-
-            {/* USDT Contribution Panel */}
-            <TabPanel>
-              <Flex flexDirection="column" alignItems="center">
-                <Box width="100%" mb={4}>
-                  <Text mb={2} fontSize="sm">Enter USDT amount</Text>
-                  <InputGroup>
-                    <InputLeftElement height="100%" display="flex" alignItems="center" pointerEvents="none">
-                      <Image src="/images/usdt.svg" alt="USDT Icon" boxSize="32px" />
-                    </InputLeftElement>
-                    <Input
-                      bg="white"
-                      color="black"
-                      placeholder="Enter USDT amount"
-                      size="lg"
-                      borderRadius="md"
-                      textAlign="right"
-                      value={usdtAmount}
-                      onChange={(e) => setUsdtAmount(e.target.value)}
-                      disabled={isPresaleCancelled} // Disable input if presale is cancelled
-                    />
-                  </InputGroup>
-                </Box>
-
-                <Text mt={2} mb={4} textAlign="right" fontSize="sm" width="100%">
-                  USDT Balance: {usdtBalance} USDT
-                </Text>
-
-                {!isPresaleCancelled && (
-                  <Text fontSize="sm" fontWeight="normal" mb={4} textAlign="left">
-                    Approve Spend then Contribute USDT will appear in place of approve button
-                  </Text>
-                )}
-
-                {usdtApproval && !isPresaleCancelled ? (
-                  <Button
-                    colorScheme="blue"
-                    width="100%"
-                    size="lg"
-                    borderRadius="xl"
-                    onClick={handleContributeUSDT}
-                  >
-                    Contribute USDT
-                  </Button>
-                ) : (
-                  !isPresaleCancelled && (
-                    <Button
-                      colorScheme="gray"
-                      width="100%"
-                      size="lg"
-                      borderRadius="xl"
-                      onClick={approveUSDT}
-                    >
-                      Approve USDT
-                    </Button>
-                  )
-                )}
-
-                {isPresaleCancelled && (
-                  <Text color="red.500" fontWeight="bold" textAlign="center" mt={4}>
-                    Presale cancelled, contributions are no longer accepted.
-                  </Text>
-                )}
-              </Flex>
-            </TabPanel>
-
-            {/* Claim or Refund Panel */}
-            <TabPanel>
-              <Flex flexDirection="column" alignItems="center">
-                {isPresaleCancelled ? (
-                  <Button
-                    colorScheme="red"
-                    width="100%"
-                    size="lg"
-                    borderRadius="xl"
-                    onClick={handleClaimOrRefund}
-                  >
-                    Refund Contributions
-                  </Button>
-                ) : (
-                  <Button
-                    colorScheme="blue"
-                    width="100%"
-                    size="lg"
-                    borderRadius="xl"
-                    onClick={handleClaimOrRefund}
-                    disabled={!isClaimEnabled}
-                  >
-                    Claim Tokens
-                  </Button>
-                )}
-              </Flex>
-            </TabPanel>
-
-            {/* User Contribution Position Panel */}
-            <TabPanel>
-              <Box width="100%" mt={10} p={4} borderRadius="md" boxShadow="lg">
-                <Text fontSize="lg" fontWeight="bold" mb={4} textAlign="center">
-                  Your Contributions
-                </Text>
-                <Flex justifyContent="space-between" mb={2}>
-                  <Text>{PRESALE_TOKEN_ADDRESS}</Text>
-                </Flex>
-                <Flex justifyContent="space-between" mb={2}>
-                  <Text>ETH Contribution:</Text>
-                  <Text>{ethContribution} ETH (${ethContributionInUSD.toFixed(2)} USD)</Text>
-                </Flex>
-                <Flex justifyContent="space-between" mb={2}>
-                  <Text>USDT Contribution:</Text>
-                  <Text>{parseFloat(usdtContribution).toFixed(3)} USDT (${parseFloat(usdtContribution).toFixed(2)} USD)</Text>
-                </Flex>
-
-                <Flex justifyContent="space-between" mb={2}>
-                  <Text>Total Contribution in USD:</Text>
-                  <Text>${totalUserContributionUSD.toFixed(2)}</Text>
-                </Flex>
-                <Flex justifyContent="space-between">
-                  <Text>Your Purchase Percentage:</Text>
-                  <Text>{contributionPercentage.toFixed(2)}%</Text>
-                </Flex>
-                <Flex justifyContent="space-between">
-                  <Text>Expected Tokens:</Text>
-                  <Text>{expectedTokens.toFixed(2)}</Text>
-                </Flex>
-
+                    borderRadius="md"
+                    textAlign="right"
+                    value={ethAmount}
+                    onChange={(e) => setEthAmount(e.target.value)}
+                    disabled={isPresaleCancelled} // Disable input if presale is cancelled
+                  />
+                </InputGroup>
               </Box>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Flex>
-    );
 
+              <Text mt={2} mb={4} textAlign="right" fontSize="sm" width="100%">
+                ETH Balance: {ethBalance} ETH (${parseFloat(ethBalanceInUSD).toFixed(2)} USD)
+              </Text>
+
+              {!isPresaleCancelled && (
+                <Button
+                  colorScheme="blue"
+                  width="100%"
+                  size="lg"
+                  borderRadius="xl"
+                  onClick={handleContributeETH}
+                >
+                  Contribute ETH
+                </Button>
+              )}
+
+              {isPresaleCancelled && (
+                <Text color="red.500" fontWeight="bold" textAlign="center" mt={4}>
+                  Presale cancelled, contributions are no longer accepted.
+                </Text>
+              )}
+            </Flex>
+          </TabPanel>
+
+          {/* USDT Contribution Panel */}
+          <TabPanel>
+            <Flex flexDirection="column" alignItems="center">
+              <Box width="100%" mb={4}>
+                <Text mb={2} fontSize="sm">Enter USDT amount</Text>
+                <InputGroup>
+                  <InputLeftElement height="100%" display="flex" alignItems="center" pointerEvents="none">
+                    <Image src="/images/usdt.svg" alt="USDT Icon" boxSize="32px" />
+                  </InputLeftElement>
+                  <Input
+                    bg="white"
+                    color="black"
+                    placeholder="Enter USDT amount"
+                    size="lg"
+                    borderRadius="md"
+                    textAlign="right"
+                    value={usdtAmount}
+                    onChange={(e) => setUsdtAmount(e.target.value)}
+                    disabled={isPresaleCancelled} // Disable input if presale is cancelled
+                  />
+                </InputGroup>
+              </Box>
+
+              <Text mt={2} mb={4} textAlign="right" fontSize="sm" width="100%">
+                USDT Balance: {usdtBalance} USDT
+              </Text>
+
+              {!isPresaleCancelled && (
+                <Text fontSize="sm" fontWeight="normal" mb={4} textAlign="left">
+                  Approve Spend then Contribute USDT will appear in place of approve button
+                </Text>
+              )}
+
+              {usdtApproval && !isPresaleCancelled ? (
+                <Button
+                  colorScheme="blue"
+                  width="100%"
+                  size="lg"
+                  borderRadius="xl"
+                  onClick={handleContributeUSDT}
+                >
+                  Contribute USDT
+                </Button>
+              ) : (
+                !isPresaleCancelled && (
+                  <Button
+                    colorScheme="gray"
+                    width="100%"
+                    size="lg"
+                    borderRadius="xl"
+                    onClick={approveUSDT}
+                  >
+                    Approve USDT
+                  </Button>
+                )
+              )}
+
+              {isPresaleCancelled && (
+                <Text color="red.500" fontWeight="bold" textAlign="center" mt={4}>
+                  Presale cancelled, contributions are no longer accepted.
+                </Text>
+              )}
+            </Flex>
+          </TabPanel>
+
+          {/* Claim or Refund Panel */}
+          <TabPanel>
+            <Flex flexDirection="column" alignItems="center">
+              {isPresaleCancelled ? (
+                <Button
+                  colorScheme="red"
+                  width="100%"
+                  size="lg"
+                  borderRadius="xl"
+                  onClick={handleClaimOrRefund}
+                >
+                  Refund Contributions
+                </Button>
+              ) : (
+                <Button
+                  colorScheme="blue"
+                  width="100%"
+                  size="lg"
+                  borderRadius="xl"
+                  onClick={handleClaimOrRefund}
+                  disabled={!isClaimEnabled}
+                >
+                  Claim Tokens
+                </Button>
+              )}
+            </Flex>
+          </TabPanel>
+
+          {/* User Contribution Position Panel */}
+          <TabPanel>
+            <Box width="100%" mt={10} p={4} borderRadius="md" boxShadow="lg">
+              <Text fontSize="lg" fontWeight="bold" mb={4} textAlign="center">
+                Your Contributions
+              </Text>
+              <Flex justifyContent="space-between" mb={2}>
+                <Text>{PRESALE_TOKEN_ADDRESS}</Text>
+              </Flex>
+              <Flex justifyContent="space-between" mb={2}>
+                <Text>ETH Contribution:</Text>
+                <Text>{ethContribution} ETH (${ethContributionInUSD.toFixed(2)} USD)</Text>
+              </Flex>
+              <Flex justifyContent="space-between" mb={2}>
+                <Text>USDT Contribution:</Text>
+                <Text>{parseFloat(usdtContribution).toFixed(3)} USDT (${parseFloat(usdtContribution).toFixed(2)} USD)</Text>
+              </Flex>
+
+              <Flex justifyContent="space-between" mb={2}>
+                <Text>Total Contribution in USD:</Text>
+                <Text>${totalUserContributionUSD.toFixed(2)}</Text>
+              </Flex>
+              <Flex justifyContent="space-between">
+                <Text>Your Purchase Percentage:</Text>
+                <Text>{contributionPercentage.toFixed(2)}%</Text>
+              </Flex>
+              <Flex justifyContent="space-between">
+                <Text>Expected Tokens:</Text>
+                <Text>{expectedTokens.toFixed(2)}</Text>
+              </Flex>
+            </Box>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Flex>
+  );
 };
 
 export default PresaleComponent;
