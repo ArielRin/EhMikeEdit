@@ -48,15 +48,8 @@ const NewPage = () => {
     <>
       <Box position="relative" flex={1} p={0} m={0} display="flex" flexDirection="column" color="white">
         <Box flex={1} p={0} m={0} bg="rgba(0, 0, 0, 0.65)" display="flex" flexDirection="column" color="white">
-          <Flex p={2} bg="rgba(0, 0, 0, 0.61)" justify="space-between" align="center">
-            <RouterLink to="/">
-              <Image p={2} ml="4" src="images/logobwb.png" alt="Heading" width="200px" />
-            </RouterLink>
 
-            <Flex align="right">
-              <w3m-button />
-            </Flex>
-          </Flex>
+
           <Box flex={1} p={0} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
             <Flex flex={1} m={2} p={7} borderRadius="2xl" textAlign="center" bg="rgba(0, 0, 0, 0.61)" border="2px" borderColor="#fff" flexWrap="wrap" alignItems="center" justifyContent="center" h="auto" flexDirection="column" bgImage="/images/b3.png" bgSize="cover" bgPosition="left">
 
@@ -78,6 +71,10 @@ const NewPage = () => {
                 Welcome to BABYDOGE on Base! Grab your Presale tokens while they last!
               </Text>
               <Image src="/images/logobwb.png" alt="header" mx="auto" width="30%" minW="200px" mt="28px" />
+
+                      <Flex align="center">
+                        <w3m-button />
+                      </Flex>
             </Flex>
             <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
               <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff" bg="rgba(0, 0, 0, 0.61)" bgImage="/images/b2.png" bgSize="cover" bgPosition="left">

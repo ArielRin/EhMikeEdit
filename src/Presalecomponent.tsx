@@ -53,42 +53,43 @@ const PresaleComponent: React.FC = () => {
   }, []);
 
   const initContract = async () => {
-  let provider: ethers.JsonRpcProvider | ethers.BrowserProvider;
-  let signerOrProvider: ethers.JsonRpcSigner | ethers.Provider;
+    // Initialize JsonRpcProvider for non-user-specific data
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
 
-  if (isConnected && walletProvider) {
-    provider = new ethers.BrowserProvider(walletProvider as any);
-    signerOrProvider = await provider.getSigner();
-  } else {
-    provider = new ethers.JsonRpcProvider(RPC_URL);
-    signerOrProvider = provider;
-  }
+    try {
+      const presaleContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, presaleAbi, provider);
+      setContract(presaleContract);
 
-  try {
-    const presaleContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, presaleAbi, signerOrProvider);
-    setContract(presaleContract);
+      // Fetch non-user-specific data using JsonRpcProvider
+      await fetchPresaleStatus(presaleContract);
+      await fetchEthPrice(presaleContract);
+      await fetchPresaleDetails(presaleContract);
+      await fetchTotalContributions(presaleContract);
 
-    await fetchClaimStatus(presaleContract);
-    await fetchEthPrice(presaleContract);
-    await fetchPresaleStatus(presaleContract);
-    await fetchPresaleDetails(presaleContract);
-
-    // Check if signerOrProvider is a JsonRpcSigner before calling fetchBalances
-    if (isConnected && signerOrProvider instanceof ethers.JsonRpcSigner) {
-      await fetchBalances(provider, signerOrProvider);
-      await fetchUserContributions(presaleContract);
+      // If user is connected, fetch user-specific data
+      if (isConnected && walletProvider) {
+        const signer = await (new ethers.BrowserProvider(walletProvider as any)).getSigner();
+        await fetchBalances(signer);
+        await fetchUserContributions(presaleContract, signer);
+      }
+    } catch (error) {
+      console.error("Error initializing contract:", error);
     }
-  } catch (error) {
-    console.error("Error initializing contract:", error);
-  }
-};
+  };
 
+  const fetchTotalContributions = async (contract: Contract) => {
+    try {
+      const totalContribUSD = await contract.totalContributionsUSD();
+      setTotalContributionsUSD(parseFloat(ethers.formatUnits(totalContribUSD, 6)).toFixed(2));
+    } catch (error) {
+      console.error('Error fetching total contributions:', error);
+    }
+  };
 
-
-  const fetchBalances = async (provider: ethers.JsonRpcProvider | ethers.BrowserProvider, signer: ethers.JsonRpcSigner) => {
+  const fetchBalances = async (signer: ethers.JsonRpcSigner) => {
     if (!address) return;
     try {
-      const ethBalance = await provider.getBalance(address);
+      const ethBalance = await signer.getBalance(address);
       const formattedEthBalance = ethers.formatEther(ethBalance);
       setEthBalance(parseFloat(formattedEthBalance).toFixed(5));
 
@@ -105,9 +106,16 @@ const PresaleComponent: React.FC = () => {
     }
   };
 
+  const fetchEthPrice = async (contract: Contract) => {
+    try {
+      const price = await contract.getLatestETHPrice();
+      const formattedPrice = ethers.formatUnits(price, 18);
+      setEthPrice(parseFloat(formattedPrice));
+    } catch (error) {
+      console.error("Error fetching ETH price:", error);
+    }
+  };
 
-
-  // New: Fetch presale status
   const fetchPresaleStatus = async (contract: Contract) => {
     try {
       const presaleCancelled = await contract.presaleCancelled();
@@ -117,41 +125,6 @@ const PresaleComponent: React.FC = () => {
       setIsPresaleSuccessful(presaleSuccessful);
     } catch (error) {
       console.error('Error fetching presale status:', error);
-    }
-  };
-
-
-  const fetchEthPrice = async (contract: Contract) => {
-   try {
-     const price = await contract.getLatestETHPrice();
-     const formattedPrice = ethers.formatUnits(price, 18);
-     setEthPrice(parseFloat(formattedPrice));
-   } catch (error) {
-     console.error("Error fetching ETH price:", error);
-   }
- };
-
- const fetchClaimStatus = async (contract: Contract) => {
-   try {
-     const claimStatus = await contract.claimEnabled();
-     setIsClaimEnabled(claimStatus);
-   } catch (error) {
-     console.error('Error fetching claim status:', error);
-   }
- };
-
-  const fetchUserContributions = async (contract: Contract) => {
-    if (!address) return;
-    try {
-      const ethContrib = await contract.ethContributions(address);
-      const usdtContrib = await contract.usdtContributions(address);
-      const totalContribUSD = await contract.totalContributionsUSD();
-
-      setEthContribution(parseFloat(ethers.formatEther(ethContrib)).toFixed(5));
-      setUsdtContribution(parseFloat(ethers.formatUnits(usdtContrib, 6)).toFixed(5));
-      setTotalContributionsUSD(parseFloat(ethers.formatUnits(totalContribUSD, 6)).toFixed(2));
-    } catch (error) {
-      console.error('Error fetching contributions:', error);
     }
   };
 
@@ -167,14 +140,18 @@ const PresaleComponent: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    initContract();
-    const interval = setInterval(() => {
-      initContract();
-    }, 15000);
+  const fetchUserContributions = async (contract: Contract, signer: ethers.JsonRpcSigner) => {
+    if (!address) return;
+    try {
+      const ethContrib = await contract.ethContributions(address);
+      const usdtContrib = await contract.usdtContributions(address);
 
-    return () => clearInterval(interval);
-  }, [walletProvider, isConnected]);
+      setEthContribution(parseFloat(ethers.formatEther(ethContrib)).toFixed(5));
+      setUsdtContribution(parseFloat(ethers.formatUnits(usdtContrib, 6)).toFixed(5));
+    } catch (error) {
+      console.error('Error fetching user contributions:', error);
+    }
+  };
 
   const handleContributeETH = async () => {
     if (!contract) return;
@@ -189,7 +166,7 @@ const PresaleComponent: React.FC = () => {
         isClosable: true,
         position: "top-right",
       });
-      await fetchUserContributions(contract);
+      await fetchUserContributions(contract, await (new ethers.BrowserProvider(walletProvider as any)).getSigner());
     } catch (error) {
       console.error('ETH Contribution Failed:', error);
       toast({
@@ -249,7 +226,7 @@ const PresaleComponent: React.FC = () => {
         isClosable: true,
         position: "top-right",
       });
-      await fetchUserContributions(contract);
+      await fetchUserContributions(contract, await (new ethers.BrowserProvider(walletProvider as any)).getSigner());
     } catch (error) {
       console.error('USDT Contribution Failed:', error);
       toast({
@@ -263,7 +240,6 @@ const PresaleComponent: React.FC = () => {
     }
   };
 
-  // New: Handle token claim or refund based on presale status
   const handleClaimOrRefund = async () => {
     if (!contract) return;
     try {
@@ -304,20 +280,28 @@ const PresaleComponent: React.FC = () => {
   };
 
   const ethContributionInUSD = ethContribution && ethPrice ? (parseFloat(ethContribution) * ethPrice) : 0;
-
   const totalUserContributionUSD = ethContributionInUSD + parseFloat(usdtContribution || '0');
-
   const contributionPercentage = parseFloat(totalContributionsUSD) > 0
     ? (totalUserContributionUSD / parseFloat(totalContributionsUSD)) * 100
     : 0;
-
   const expectedTokens = parseFloat(totalTokensOffered) > 0
     ? (totalUserContributionUSD / parseFloat(totalContributionsUSD)) * parseFloat(totalTokensOffered)
     : 0;
-
   const softCapPercentage = parseFloat(softCapUSD) > 0
     ? (parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100
     : 0;
+
+  useEffect(() => {
+    initContract();
+    const interval = setInterval(() => {
+      initContract();
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [isConnected, walletProvider]);
+
+
+
     return (
       <Flex
         flexDirection="column"
@@ -344,11 +328,8 @@ const PresaleComponent: React.FC = () => {
         )}
 
         <Box textAlign="center" mb={4}>
-          <Image src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
+          <Image src="images/logobwb.png" alt="header" mx="auto" width="75%" minW="250px" mt="28px" />
 
-          <Box mt={2} mx="auto" justifyContent="center">
-            <w3m-button />
-          </Box>
           <Text fontSize="2xl" fontWeight="bold">Presale ending in</Text>
           <Text fontSize="4xl" mt={2}>
             {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
