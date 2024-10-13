@@ -8,6 +8,12 @@ import Presalecomponent from './Presalecomponent';
 import PresaleAdminPage from './PresaleAdminPage';
 import ContributorList from './Components/ContributorList';
 
+import CalculatorDeployAToken from './Components/CalculatorDeployAToken';
+import TokenDetails from './Components/TokenDetails';
+import DeployPoolPage from './DeployPoolPage';
+import AdminDeployPoolPage from './AdminDeployPoolPage';
+import DeployPoolAPI from './DeployPoolAPI';
+import NftStakePage from './NftStakePage';
 
 
 import { ethers, BrowserProvider } from 'ethers';
@@ -129,7 +135,13 @@ const modal = createWeb3Modal({
           <Route path="/presale" element={<Presalecomponent />} />
           <Route path="/adminpresale" element={<PresaleAdminPage />} />
           <Route path="/list" element={<ContributorList />} />
+          <Route path="/calc" element={<CalculatorDeployAToken />} />
 
+          <Route path="/details" element={<TokenDetails />} />
+                    <Route path="/deploy" element={<DeployPoolPage />} />
+                              <Route path="/admindeploy" element={<AdminDeployPoolPage />} />
+                                        <Route path="/apipools" element={<DeployPoolAPI />} />
+                                                  <Route path="/stake" element={<NftStakePage />} />
       </Routes>
     </Router>
   );
