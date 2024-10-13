@@ -1,4 +1,5 @@
-### Comprehensive Security Audit for `NftRewardPoolV2` Contract
+
+# Comprehensive Security Audit for `NftRewardPoolV2` Contract
 
 This audit examines the `NftRewardPoolV2` contract in terms of potential vulnerabilities, logical flaws, gas optimization opportunities, and adherence to best practices. The audit also suggests mitigation strategies for any identified risks.
 
@@ -8,9 +9,10 @@ This audit examines the `NftRewardPoolV2` contract in terms of potential vulnera
 
 - **Contract Name**: `NftRewardPoolV2`
 - **Dependencies**:
-  - OpenZeppelin Libraries (Ownable, ReentrancyGuard, SafeERC20, EnumerableSet, SafeMath)
-  - IERC721 (Staked NFTs)
-  - IBEP20 (Reward Token)
+  - OpenZeppelin Libraries (`Ownable`, `ReentrancyGuard`, `SafeERC20`, `EnumerableSet`, `SafeMath`)
+  - `IERC721` (Staked NFTs)
+  - `IBEP20` (Reward Token, similar to `IERC20` but specific to BSC)
+    - **Note**: `IBEP20` is functionally the same as `IERC20`, but it’s tailored for Binance Smart Chain (BSC). If deploying this contract on a non-BSC network, consider updating `IBEP20` to `IERC20` to ensure compatibility with chain standards.
 
 ### Audit Scope
 
@@ -32,7 +34,7 @@ The audit focuses on the following critical areas:
 
 - **Risk**: Reentrancy attacks occur when an external contract repeatedly calls back into a vulnerable function, potentially draining funds or causing incorrect state changes.
 - **Mitigation**: The contract uses OpenZeppelin's `ReentrancyGuard`, which ensures that critical functions (`deposit`, `withdraw`, `emergencyWithdraw`) are protected from reentrancy attacks.
-  - **Recommendation**: The existing implementation is safe and follows best practices. No further changes needed for reentrancy protection.
+  - **Recommendation**: The existing implementation is secure and follows best practices. No further changes needed for reentrancy protection.
 
 **Rating**: ✔️ Secure
 
@@ -51,7 +53,8 @@ The audit focuses on the following critical areas:
 ### 3. **Token Transfer Safety**
 
 - **Risk**: Incorrect token transfer handling (e.g., handling tokens that don’t return true/false on transfers) can lead to loss of tokens or stuck funds.
-- **Mitigation**: The contract uses OpenZeppelin's `SafeERC20` library, which ensures safe interactions with the reward token (IBEP20). `SafeERC20` correctly handles edge cases for tokens that may return `false` or revert.
+- **Mitigation**: The contract uses OpenZeppelin's `SafeERC20` library, which ensures safe interactions with the reward token (`IBEP20`/`IERC20`). `SafeERC20` correctly handles edge cases for tokens that may return `false` or revert.
+  - **Note**: If deploying on a non-BSC network, switch from `IBEP20` to `IERC20` to comply with network standards.
   - **Recommendation**: The contract correctly handles safe transfers using the library. No issues identified.
 
 **Rating**: ✔️ Secure
@@ -141,14 +144,11 @@ The audit focuses on the following critical areas:
 3. **Flexibility in Fee Updates**: Add the ability to modify registration fees and recipient addresses dynamically during contract operation.
 4. **Thorough Testing**: Ensure comprehensive testing of reward calculations, especially around edge cases like block number limits, large pool sizes, and reward claim scenarios.
 5. **Upgradeability**: Consider implementing an upgradeable proxy pattern if the system needs future updates without redeploying the entire contract.
+6. **Chain Standardization**: If deploying the contract on non-BSC chains, update the reward token interface from `IBEP20` to `IERC20` to comply with standard token interfaces across Ethereum or other chains.
 
 ---
 
-**Overall Security Rating**: ✔️ **Secure, with minor optimizations and enhancements recommended.**
-
----
-
-
+**Overall Security Rating**
 ## NftRewardPoolV2
 
 The `NftRewardPoolV2` contract allows users to stake NFTs and earn rewards in the form of ERC20/BEP20 tokens. It supports features like user registration, pool configuration, depositing and withdrawing staked tokens, and emergency mechanisms. This contract utilizes OpenZeppelin’s `Ownable`, `ReentrancyGuard`, and `SafeERC20` libraries to ensure security and proper token handling.
