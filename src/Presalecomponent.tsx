@@ -345,7 +345,8 @@ const PresaleComponent: React.FC = () => {
 
         <Box textAlign="center" mb={4}>
           <Image src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
-          <Box mt={2} mx="auto" align="center">
+
+          <Box mt={2} mx="auto" justifyContent="center">
             <w3m-button />
           </Box>
           <Text fontSize="2xl" fontWeight="bold">Presale ending in</Text>

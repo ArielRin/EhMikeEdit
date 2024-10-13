@@ -82,7 +82,7 @@ const modal = createWeb3Modal({
   tokens: {
     8453: {
       address: '0xA716C25e30Af41472bd51C92A643861d4Fa28021',
-      image: '/images/Eh8r.png'
+      image: 'https://raw.githubusercontent.com/ArielRin/WS20Ehvi8r/refs/heads/web3modal/Eh8r.png'
     },
   },
   featuredWalletIds: [

@@ -53,7 +53,7 @@ const NftStakingPage = () => {
   const [nftContract, setNftContract] = useState<Contract | null>(null);
 
   const initContract = async () => {
-    let provider: ethers.JsonRpcProvider;
+    let provider: ethers.BrowserProvider | ethers.JsonRpcProvider;
     let signerOrProvider: ethers.JsonRpcSigner | ethers.Provider;
 
     if (isConnected && walletProvider) {
@@ -63,6 +63,7 @@ const NftStakingPage = () => {
       provider = new ethers.JsonRpcProvider(RPC_URL);
       signerOrProvider = provider;
     }
+
 
     try {
       const stakingContractInstance = new ethers.Contract(contractAddress, contractABI, signerOrProvider);
@@ -211,37 +212,53 @@ const NftStakingPage = () => {
     }
   };
 
+
   const stakeNFTs = async () => {
-    if (!stakingContract || !nftContract || !address || selectedTokenIds.length === 0) return;
+  if (!stakingContract || !nftContract || !address || selectedTokenIds.length === 0) return;
 
-    try {
-      await approveNFTs();
-      const tx = await stakingContract.deposit(selectedTokenIds);
-      await tx.wait();
-      toast({
-        title: "Stake Successful",
-        description: `Staked NFT tokens: ${selectedTokenIds.join(", ")}`,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
+  try {
+    // Initialize provider
+    const provider = walletProvider
+      ? new ethers.BrowserProvider(walletProvider as ethers.Eip1193Provider)
+      : new ethers.JsonRpcProvider(RPC_URL);
 
-      setSelectedTokenIds([]);
-      await fetchContractData(stakingContract, nftContract, walletProvider || new ethers.JsonRpcProvider(RPC_URL));
-    } catch (error) {
-      console.error("Error staking NFTs:", error);
-      toast({
-        title: "Error",
-        description: "Failed to stake NFTs",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+    // Approve NFTs for staking
+    await approveNFTs();
+
+    // Stake the selected NFTs
+    const tx = await stakingContract.deposit(selectedTokenIds);
+    await tx.wait();
+
+    // Show success message
+    toast({
+      title: "Stake Successful",
+      description: `Staked NFT tokens: ${selectedTokenIds.join(", ")}`,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+
+    // Clear selected tokens
+    setSelectedTokenIds([]);
+
+    // Refresh contract data only if contracts are not null
+    if (stakingContract && nftContract) {
+      await fetchContractData(stakingContract, nftContract, provider);
     }
-  };
+  } catch (error) {
+    console.error("Error staking NFTs:", error);
+    toast({
+      title: "Error",
+      description: "Failed to stake NFTs",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+};
 
   const withdrawNFTs = async () => {
-    if (!stakingContract || !address || selectedTokenIds.length === 0) {
+    if (!stakingContract || !nftContract || !address || selectedTokenIds.length === 0) {
       toast({
         title: "Error",
         description: "No NFTs selected for withdrawal",
@@ -267,7 +284,15 @@ const NftStakingPage = () => {
       });
 
       setSelectedTokenIds([]);
-      await fetchContractData(stakingContract, nftContract, walletProvider || new ethers.JsonRpcProvider(RPC_URL));
+
+      // Ensure stakingContract and nftContract are not null before fetching data
+      const provider = walletProvider
+        ? new ethers.BrowserProvider(walletProvider as ethers.Eip1193Provider)
+        : new ethers.JsonRpcProvider(RPC_URL);
+
+      if (stakingContract && nftContract) {
+        await fetchContractData(stakingContract, nftContract, provider);
+      }
     } catch (error) {
       console.error("Error withdrawing NFTs:", error);
       toast({
@@ -278,7 +303,8 @@ const NftStakingPage = () => {
         isClosable: true,
       });
     }
-  };
+    };
+
 
   const loadNftImages = async () => {
     const imageMap: { [tokenId: number]: string | null } = {};
@@ -305,7 +331,7 @@ const NftStakingPage = () => {
   return (
     <Box  bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
       <Box maxW="1000px" mx="auto">
-        <Flex p={2} bg="rgba(0, 0, 0, 0.65)"  justify="space-between" align="center">
+        <Flex p={6} bg="rgba(0, 0, 0, 0.65)"  justify="space-between" align="center">
           <Heading>Foxy NFT Staking</Heading>
 
           <Flex align="right">
@@ -374,7 +400,10 @@ const NftStakingPage = () => {
               Approve & Unstake Selected NFTs
             </Button>
             <Text mt={6}><strong>Unstake your NFTs to Claim Rewards</strong></Text>
-            <Text mt={6}><strong>Current Staking Claim Value:</strong> ${parseFloat(pendingRewardUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+            <Text mt={6}><strong>Current Staking Claim Value:</strong> ${pendingRewardUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+
+
+            {rewardTokenBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
             <Text><strong>Staking Tokens Earned:</strong> {pendingReward}</Text>
           </Box>
         </Flex>
@@ -382,15 +411,15 @@ const NftStakingPage = () => {
         {/* Staking Stats */}
         <Box mt={6} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
           <Heading size="md" mb={4}>Your Staking Stats</Heading>
-          <Text><strong>Pending Reward:</strong> {pendingReward} Reward Tokens ({parseFloat(pendingRewardUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)</Text>
+          <Text><strong>Pending Reward:</strong> {pendingReward} Reward Tokens ({pendingRewardUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)</Text>
           <Text mt={6}><strong>Blocks Remaining:</strong> {remainingBlocks}</Text>
           <Text><strong>Estimated End Date:</strong> {timeExceeded ? "Bonus time until tokens in the pool are depleted" : estimatedTime}</Text>
           <Text mt={4} >
             <strong>Remaining Rewards to Distribute:</strong>
           </Text>
           <Text mt={2}>
-          {parseFloat(rewardTokenBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ( $
-            {parseFloat(rewardTokenBalanceUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+          {parseFloat(rewardTokenBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ($
+            {rewardTokenBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
           </Text>
           <Text mt={6}><strong>Reward Token Price:</strong> ${rewardTokenPrice.toFixed(8)} USD</Text>
 
