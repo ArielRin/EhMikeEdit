@@ -3,6 +3,20 @@
 This audit examines the `NftRewardPoolV2` contract in terms of potential vulnerabilities, logical flaws, gas optimization opportunities, and adherence to best practices. The audit also suggests mitigation strategies for any identified risks.
 
 ---
+## Contract Overview
+
+The `NftRewardPoolV2` contract allows users to stake NFTs and earn rewards in the form of ERC20/BEP20 tokens. It supports features like user registration, pool configuration, depositing and withdrawing staked tokens, and emergency mechanisms. This contract utilizes OpenZeppelin’s `Ownable`, `ReentrancyGuard`, and `SafeERC20` libraries to ensure security and proper token handling.
+
+- **Staked Tokens**: ERC721 (NFTs)
+- **Reward Tokens**: ERC20/BEP20
+- **Core Features**:
+  - User staking of NFTs
+  - Reward distribution in ERC20/BEP20 tokens
+  - User registration with fees
+  - Pool limits per user
+  - Emergency withdrawal and reward withdrawal
+  - Admin functions to recover tokens and manage pool configurations
+
 
 ### Audit Overview
 
@@ -147,6 +161,8 @@ The audit focuses on the following critical areas:
 
 ---
 
+---
+
 **Overall Security Rating**
 
 : ✔️ **Secure, with minor optimizations and enhancements recommended.**
@@ -155,19 +171,6 @@ The audit focuses on the following critical areas:
 
 ---
 
-## NftRewardPoolV2 Overview
-
-The `NftRewardPoolV2` contract allows users to stake NFTs and earn rewards in the form of ERC20/BEP20 tokens. It supports features like user registration, pool configuration, depositing and withdrawing staked tokens, and emergency mechanisms. This contract utilizes OpenZeppelin’s `Ownable`, `ReentrancyGuard`, and `SafeERC20` libraries to ensure security and proper token handling.
-
-- **Staked Tokens**: ERC721 (NFTs)
-- **Reward Tokens**: ERC20/BEP20
-- **Core Features**:
-  - User staking of NFTs
-  - Reward distribution in ERC20/BEP20 tokens
-  - User registration with fees
-  - Pool limits per user
-  - Emergency withdrawal and reward withdrawal
-  - Admin functions to recover tokens and manage pool configurations
 
 
 ## Functions
