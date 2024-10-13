@@ -88,7 +88,7 @@ const DeployPoolPage: React.FC = () => {
         admin,
         projectTaxAddress,
         taxAddress,
-        ethers.parseUnits(rewardPerBlock, 18),
+        rewardPerBlock,
         startBlock,
         bonusEndBlock,
         poolLimitPerUser,
