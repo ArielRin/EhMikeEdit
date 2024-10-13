@@ -26,7 +26,8 @@ The `NftRewardPoolV2` contract allows users to stake NFTs and earn rewards in th
   - OpenZeppelin Libraries (`Ownable`, `ReentrancyGuard`, `SafeERC20`, `EnumerableSet`, `SafeMath`)
   - `IERC721` (Staked NFTs)
   - `IBEP20` (Reward Token, similar to `IERC20` but specific to BSC)
-    - **Note**: `IBEP20` is functionally the same as `IERC20`, but it’s tailored for Binance Smart Chain (BSC). If deploying this contract on a non-BSC network, consider updating `IBEP20` to `IERC20` to ensure compatibility with chain standards.
+  
+  **Note**: `IBEP20` is functionally the same as `IERC20`, but it’s tailored for Binance Smart Chain (BSC). If deploying this contract on a non-BSC network, consider updating `IBEP20` to `IERC20` to ensure compatibility with chain standards.
 
 ### Audit Scope
 
