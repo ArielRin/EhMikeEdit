@@ -153,8 +153,7 @@ The audit focuses on the following critical areas:
 
 ---
 
-This concludes the comprehensive security audit for the `NftRewardPoolV2` contract. Let me know if you need further clarifications or any assistance with implementing these recommendations!
-
+---
 
 ## NftRewardPoolV2 Overview
 
