@@ -4,14 +4,32 @@ This audit examines the `NftRewardPoolV2` contract in terms of potential vulnera
 
 ---
 
+### Contract Overview
+
+The `NftRewardPoolV2` contract allows users to stake NFTs and earn rewards in the form of ERC20/BEP20 tokens. It supports features like user registration, pool configuration, depositing and withdrawing staked tokens, and emergency mechanisms. This contract utilizes OpenZeppelin’s `Ownable`, `ReentrancyGuard`, and `SafeERC20` libraries to ensure security and proper token handling.
+
+- **Staked Tokens**: ERC721 (NFTs)
+- **Reward Tokens**: ERC20/BEP20
+- **Core Features**:
+  - User staking of NFTs
+  - Reward distribution in ERC20/BEP20 tokens
+  - User registration with fees
+  - Pool limits per user
+  - Emergency withdrawal and reward withdrawal
+  - Admin functions to recover tokens and manage pool configurations
+
+
 ### Audit Overview
 
 - **Contract Name**: `NftRewardPoolV2`
+- **Chain**: `Base Chain`
+- **Contract Address**: `0xa73F53d6737a78e90e0716b8C3a472e4536e93C0`
 - **Dependencies**:
   - OpenZeppelin Libraries (`Ownable`, `ReentrancyGuard`, `SafeERC20`, `EnumerableSet`, `SafeMath`)
   - `IERC721` (Staked NFTs)
   - `IBEP20` (Reward Token, similar to `IERC20` but specific to BSC)
-    - **Note**: `IBEP20` is functionally the same as `IERC20`, but it’s tailored for Binance Smart Chain (BSC). If deploying this contract on a non-BSC network, consider updating `IBEP20` to `IERC20` to ensure compatibility with chain standards.
+
+  **Note**: `IBEP20` is functionally the same as `IERC20`, but it’s tailored for Binance Smart Chain (BSC). If deploying this contract on a non-BSC network, consider updating `IBEP20` to `IERC20` to ensure compatibility with chain standards.
 
 ### Audit Scope
 
@@ -147,6 +165,8 @@ The audit focuses on the following critical areas:
 
 ---
 
+---
+
 **Overall Security Rating**
 
 : ✔️ **Secure, with minor optimizations and enhancements recommended.**
@@ -155,61 +175,8 @@ The audit focuses on the following critical areas:
 
 ---
 
-## NftRewardPoolV2 Overview
+---
 
-The `NftRewardPoolV2` contract allows users to stake NFTs and earn rewards in the form of ERC20/BEP20 tokens. It supports features like user registration, pool configuration, depositing and withdrawing staked tokens, and emergency mechanisms. This contract utilizes OpenZeppelin’s `Ownable`, `ReentrancyGuard`, and `SafeERC20` libraries to ensure security and proper token handling.
-
-- **Staked Tokens**: ERC721 (NFTs)
-- **Reward Tokens**: ERC20/BEP20
-- **Core Features**:
-  - User staking of NFTs
-  - Reward distribution in ERC20/BEP20 tokens
-  - User registration with fees
-  - Pool limits per user
-  - Emergency withdrawal and reward withdrawal
-  - Admin functions to recover tokens and manage pool configurations
-
-## Contract Deployment
-
-When deploying the contract, you must pass the `RewardPoolConfiguration` struct to the constructor. This configuration contains the addresses for the staked and reward tokens, reward rates, pool limits, taxes, and admin.
-
-### RewardPoolConfiguration
-
-```solidity
-struct RewardPoolConfiguration {
-    address stakedToken;
-    address rewardToken;
-    address admin;
-    address projectTaxAddress;
-    address taxAddress;
-    uint256 rewardPerBlock;
-    uint256 startBlock;
-    uint256 bonusEndBlock;
-    uint256 poolLimitPerUser;
-    uint256 tax;
-    uint256 projectTax;
-}
-```
-
-### Deployment Example:
-
-```solidity
-RewardPoolConfiguration memory config = RewardPoolConfiguration(
-    stakedTokenAddress,      // ERC721 token address
-    rewardTokenAddress,      // ERC20 token address
-    adminAddress,            // Admin address
-    projectTaxAddress,       // Project tax address
-    taxAddress,              // Tax address
-    rewardPerBlock,          // Rewards per block
-    startBlock,              // Start block for reward distribution
-    bonusEndBlock,           // End block for reward distribution
-    poolLimitPerUser,        // Max number of NFTs a user can stake
-    tax,                     // Registration tax
-    projectTax               // Project tax
-);
-
-NftRewardPoolV2 pool = new NftRewardPoolV2(config);
-```
 
 ## Functions
 
