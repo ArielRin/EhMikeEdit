@@ -169,47 +169,6 @@ The `NftRewardPoolV2` contract allows users to stake NFTs and earn rewards in th
   - Emergency withdrawal and reward withdrawal
   - Admin functions to recover tokens and manage pool configurations
 
-## Contract Deployment
-
-When deploying the contract, you must pass the `RewardPoolConfiguration` struct to the constructor. This configuration contains the addresses for the staked and reward tokens, reward rates, pool limits, taxes, and admin.
-
-### RewardPoolConfiguration
-
-```solidity
-struct RewardPoolConfiguration {
-    address stakedToken;
-    address rewardToken;
-    address admin;
-    address projectTaxAddress;
-    address taxAddress;
-    uint256 rewardPerBlock;
-    uint256 startBlock;
-    uint256 bonusEndBlock;
-    uint256 poolLimitPerUser;
-    uint256 tax;
-    uint256 projectTax;
-}
-```
-
-### Deployment Example:
-
-```solidity
-RewardPoolConfiguration memory config = RewardPoolConfiguration(
-    stakedTokenAddress,      // ERC721 token address
-    rewardTokenAddress,      // ERC20 token address
-    adminAddress,            // Admin address
-    projectTaxAddress,       // Project tax address
-    taxAddress,              // Tax address
-    rewardPerBlock,          // Rewards per block
-    startBlock,              // Start block for reward distribution
-    bonusEndBlock,           // End block for reward distribution
-    poolLimitPerUser,        // Max number of NFTs a user can stake
-    tax,                     // Registration tax
-    projectTax               // Project tax
-);
-
-NftRewardPoolV2 pool = new NftRewardPoolV2(config);
-```
 
 ## Functions
 
