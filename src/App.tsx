@@ -14,6 +14,7 @@ import DeployPoolPage from './DeployPoolPage';
 import AdminDeployPoolPage from './AdminDeployPoolPage';
 import DeployPoolAPI from './DeployPoolAPI';
 import NftStakePage from './NftStakePage';
+import NftStakeStats from './NftStakeStats'; 
 import Stakecalc from './Stakecalc';
 
 
@@ -144,11 +145,12 @@ const modal = createWeb3Modal({
           <Route path="/list" element={<ContributorList />} />
           <Route path="/calc" element={<CalculatorDeployAToken />} />
           <Route path="/details" element={<TokenDetails />} />
-                    <Route path="/deploy" element={<DeployPoolPage />} />
-                              <Route path="/admindeploy" element={<AdminDeployPoolPage />} />
-                                        <Route path="/apipools" element={<DeployPoolAPI />} />
-                                        <Route path="/stake" element={<NftStakePage />} />
-                                        <Route path="/stakecalc" element={<Stakecalc />} />
+          <Route path="/deploy" element={<DeployPoolPage />} />
+          <Route path="/admindeploy" element={<AdminDeployPoolPage />} />
+          <Route path="/apipools" element={<DeployPoolAPI />} />
+          <Route path="/stake" element={<NftStakePage />} />
+          <Route path="/nftstats" element={<NftStakeStats />} />
+          <Route path="/stakecalc" element={<Stakecalc />} />
       </Routes>
     </Router>
   );

@@ -9,7 +9,6 @@ import {
   Grid,
   GridItem,
   Image,
-  Checkbox,
   useToast,
   Link,
 } from "@chakra-ui/react";
@@ -27,15 +26,12 @@ const RPC_URL = import.meta.env.VITE_RPC_URL as string;
 
 // Base chain block time (1.9 seconds per block)
 const BLOCK_TIME_SECONDS = 1.9;
-const REWARD_TOKEN_DECIMALS = 18; // Set reward token decimals to 9 for RYIU
+const REWARD_TOKEN_DECIMALS = 18;
 
 const NftStakingPage = () => {
   const [currentBlock, setCurrentBlock] = useState<number>(0);
-  const [bonusEndBlock, setBonusEndBlock] = useState<number>(0);
   const [remainingBlocks, setRemainingBlocks] = useState<number>(0);
   const [pendingReward, setPendingReward] = useState<string>("0");
-  const [estimatedTime, setEstimatedTime] = useState<string>("");
-  const [timeExceeded, setTimeExceeded] = useState<boolean>(false);
   const [rewardTokenPrice, setRewardTokenPrice] = useState<number>(0);
   const [pendingRewardUSD, setPendingRewardUSD] = useState<number>(0);
   const [rewardTokenBalance, setRewardTokenBalance] = useState<string>("0");
@@ -45,7 +41,6 @@ const NftStakingPage = () => {
   const [nftImages, setNftImages] = useState<{ [key: number]: string | null }>({});
   const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
   const [userStakedTokenCount, setUserStakedTokenCount] = useState<number>(0);
-
 
   const { isConnected, address } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
@@ -65,7 +60,6 @@ const NftStakingPage = () => {
       provider = new ethers.JsonRpcProvider(RPC_URL);
       signerOrProvider = provider;
     }
-
 
     try {
       const stakingContractInstance = new ethers.Contract(contractAddress, contractABI, signerOrProvider);
@@ -98,7 +92,6 @@ const NftStakingPage = () => {
     setCurrentBlock(blockNumber);
 
     const endBlock = await stakingContract.bonusEndBlock();
-    setBonusEndBlock(Number(endBlock));
     const remaining = Math.max(Number(endBlock) - blockNumber, 0);
     setRemainingBlocks(remaining);
 
@@ -109,17 +102,12 @@ const NftStakingPage = () => {
     const userTokens = await stakingContract.getUserStakedTokens(address, 100, 0);
     setUserStakedTokens(userTokens[0]);
 
+    const stakedTokenCount = await stakingContract.getUserStakedTokensCount(address);
+    setUserStakedTokenCount(Number(stakedTokenCount));
+
     await fetchOwnedNFTs(nftContract);
     await fetchRewardTokenBalance(stakingContract, provider);
 
-    calculateEstimatedTime(remaining);
-
-
-
-        const stakedTokenCount = await stakingContract.getUserStakedTokensCount(address);
-        setUserStakedTokenCount(Number(stakedTokenCount));
-
-    // Calculate pending rewards in USD
     const pendingRewardUSDValue = parseFloat(formattedPendingReward) * rewardTokenPrice;
     setPendingRewardUSD(pendingRewardUSDValue);
   };
@@ -128,10 +116,9 @@ const NftStakingPage = () => {
     const rewardTokenAddress = await stakingContract.rewardToken();
     const rewardTokenContract = new ethers.Contract(rewardTokenAddress, erc20ABI, provider);
     const contractBalance = await rewardTokenContract.balanceOf(contractAddress);
-    const formattedRewardTokenBalance = ethers.formatUnits(contractBalance, );
+    const formattedRewardTokenBalance = ethers.formatUnits(contractBalance, REWARD_TOKEN_DECIMALS);
     setRewardTokenBalance(formattedRewardTokenBalance);
 
-    // Calculate remaining tokens in USD
     const rewardTokenBalanceUSDValue = parseFloat(formattedRewardTokenBalance) * rewardTokenPrice;
     setRewardTokenBalanceUSD(rewardTokenBalanceUSDValue);
   };
@@ -167,24 +154,6 @@ const NftStakingPage = () => {
     }
   };
 
-  const calculateEstimatedTime = (remainingBlocks: number) => {
-    const totalSeconds = remainingBlocks * BLOCK_TIME_SECONDS;
-    const totalHours = Math.round(totalSeconds / 3600);
-
-    const estimatedDate = new Date(Date.now() + totalHours * 3600000);
-
-    if (estimatedDate.getTime() <= Date.now()) {
-      setTimeExceeded(true);
-    } else {
-      setTimeExceeded(false);
-      setEstimatedTime(`${estimatedDate.toLocaleString()}`);
-    }
-  };
-
-  useEffect(() => {
-    initContract();
-  }, [stakingContract, nftContract, walletProvider, isConnected]);
-
   const handleTokenSelection = (tokenId: number) => {
     const isSelected = selectedTokenIds.includes(tokenId);
     setSelectedTokenIds(isSelected ? selectedTokenIds.filter(id => id !== tokenId) : [...selectedTokenIds, tokenId]);
@@ -219,50 +188,43 @@ const NftStakingPage = () => {
     }
   };
 
-
   const stakeNFTs = async () => {
-  if (!stakingContract || !nftContract || !address || selectedTokenIds.length === 0) return;
+    if (!stakingContract || !nftContract || !address || selectedTokenIds.length === 0) return;
 
-  try {
-    // Initialize provider
-    const provider = walletProvider
-      ? new ethers.BrowserProvider(walletProvider as ethers.Eip1193Provider)
-      : new ethers.JsonRpcProvider(RPC_URL);
+    try {
+      const provider = walletProvider
+        ? new ethers.BrowserProvider(walletProvider as ethers.Eip1193Provider)
+        : new ethers.JsonRpcProvider(RPC_URL);
 
-    // Approve NFTs for staking
-    await approveNFTs();
+      await approveNFTs();
 
-    // Stake the selected NFTs
-    const tx = await stakingContract.deposit(selectedTokenIds);
-    await tx.wait();
+      const tx = await stakingContract.deposit(selectedTokenIds);
+      await tx.wait();
 
-    // Show success message
-    toast({
-      title: "Stake Successful",
-      description: `Staked NFT tokens: ${selectedTokenIds.join(", ")}`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+      toast({
+        title: "Stake Successful",
+        description: `Staked NFT tokens: ${selectedTokenIds.join(", ")}`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
 
-    // Clear selected tokens
-    setSelectedTokenIds([]);
+      setSelectedTokenIds([]);
 
-    // Refresh contract data only if contracts are not null
-    if (stakingContract && nftContract) {
-      await fetchContractData(stakingContract, nftContract, provider);
+      if (stakingContract && nftContract) {
+        await fetchContractData(stakingContract, nftContract, provider);
+      }
+    } catch (error) {
+      console.error("Error staking NFTs:", error);
+      toast({
+        title: "Error",
+        description: "Failed to stake NFTs",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
-  } catch (error) {
-    console.error("Error staking NFTs:", error);
-    toast({
-      title: "Error",
-      description: "Failed to stake NFTs",
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-    });
-  }
-};
+  };
 
   const withdrawNFTs = async () => {
     if (!stakingContract || !nftContract || !address || selectedTokenIds.length === 0) {
@@ -292,7 +254,6 @@ const NftStakingPage = () => {
 
       setSelectedTokenIds([]);
 
-      // Ensure stakingContract and nftContract are not null before fetching data
       const provider = walletProvider
         ? new ethers.BrowserProvider(walletProvider as ethers.Eip1193Provider)
         : new ethers.JsonRpcProvider(RPC_URL);
@@ -310,8 +271,7 @@ const NftStakingPage = () => {
         isClosable: true,
       });
     }
-    };
-
+  };
 
   const loadNftImages = async () => {
     const imageMap: { [tokenId: number]: string | null } = {};
@@ -330,93 +290,96 @@ const NftStakingPage = () => {
   };
 
   useEffect(() => {
+    initContract();
+  }, [stakingContract, nftContract, walletProvider, isConnected]);
+
+  useEffect(() => {
     if (ownedNFTs.length > 0 || userStakedTokens.length > 0) {
       loadNftImages();
     }
   }, [ownedNFTs, userStakedTokens]);
 
-
-    return (
-      <Box bgImage="/images/foxyBkg.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
-        <Box maxW="1000px" mx="auto">
-          <Flex p={6} bg="rgba(0, 0, 0, 0.65)" justify="space-between" align="center">
-            <Heading>Foxy NFT Staking Stats</Heading>
-            <Flex align="right">
-              <w3m-button />
-            </Flex>
+  return (
+    <Box bgImage="/images/foxyBkg.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
+      <Box maxW="1000px" mx="auto">
+        <Flex p={6} bg="rgba(0, 0, 0, 0.65)" justify="space-between" align="center">
+          <Heading>Foxy NFT Staking Stats</Heading>
+          <Flex align="right">
+            <w3m-button />
           </Flex>
-          <Heading p={2} bg="rgba(0, 0, 0, 0.65)" size="md">
-            Stake Foxy NFT - Earn $RYIU
-          </Heading>
+        </Flex>
+        <Heading p={2} bg="rgba(0, 0, 0, 0.65)" size="md">
+          Stake Foxy NFT - Earn $RYIU
+        </Heading>
 
-          {/* Staking Stats */}
-          <Box mt={6} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
-            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6}>
-              {/* Pending Reward */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  Pending Reward
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  {pendingReward}
-                </Text>
-                <Text fontSize="lg" mt={2}>
-                  ({pendingRewardUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                </Text>
-              </Box>
+        {/* Staking Stats */}
+        <Box mt={6} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
+          <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6}>
+            {/* Pending Reward */}
+            <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
+              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                Pending Reward
+              </Text>
+              <Text fontSize="4xl" fontWeight="bold" color="white">
+                {pendingReward}
+              </Text>
+              <Text fontSize="lg" mt={2}>
+                ({pendingRewardUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+              </Text>
+            </Box>
 
-              {/* Blocks Remaining */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  Blocks Remaining
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  {remainingBlocks}
-                </Text>
-                <Text fontSize="lg" mt={2}>Until End of Staking</Text>
-              </Box>
+            {/* Blocks Remaining */}
+            <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
+              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                Blocks Remaining
+              </Text>
+              <Text fontSize="4xl" fontWeight="bold" color="white">
+                {remainingBlocks}
+              </Text>
+              <Text fontSize="lg" mt={2}>Until End of Staking</Text>
+            </Box>
 
-              {/* User Staked Tokens Count */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  Your Staked NFTs
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  {userStakedTokenCount}
-                </Text>
-                <Text fontSize="lg" mt={2}>NFTs Staked</Text>
-              </Box>
-            </Grid>
+            {/* User Staked Tokens Count */}
+            <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
+              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                Your Staked NFTs
+              </Text>
+              <Text fontSize="4xl" fontWeight="bold" color="white">
+                {userStakedTokenCount}
+              </Text>
+              <Text fontSize="lg" mt={2}>NFTs Staked</Text>
+            </Box>
+          </Grid>
 
-            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mt={6}>
-              {/* Remaining Rewards */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  Remaining Rewards to Distribute
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  {parseFloat(rewardTokenBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                </Text>
-                <Text fontSize="lg" mt={2}>
-                  (${rewardTokenBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                </Text>
-              </Box>
+          <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mt={6}>
+            {/* Remaining Rewards */}
+            <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
+              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                Remaining Rewards to Distribute
+              </Text>
+              <Text fontSize="4xl" fontWeight="bold" color="white">
+                {parseFloat(rewardTokenBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </Text>
+              <Text fontSize="lg" mt={2}>
+                (${rewardTokenBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+              </Text>
+            </Box>
 
-              {/* Reward Token Price */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  $RYIU Token Price
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  ${rewardTokenPrice.toFixed(8)}
-                </Text>
-                <Text fontSize="lg" mt={2}>USD per Token</Text>
-              </Box>
-            </Grid>
-          </Box>
+            {/* Reward Token Price */}
+            <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
+              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                $RYIU Token Price
+              </Text>
+              <Text fontSize="4xl" fontWeight="bold" color="white">
+                ${rewardTokenPrice.toFixed(8)}
+              </Text>
+              <Text fontSize="lg" mt={2}>USD per Token</Text>
+            </Box>
+          </Grid>
+        </Box>
+
         {/* Flex container for Unstaked and Staked NFTs */}
         <Flex direction={{ base: "column", md: "row" }} gap={6} mt={6}>
-
           {/* Unstaked NFTs */}
           <Box flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
             <Heading size="md" mb={4}>Your Unstaked NFTs</Heading>
@@ -430,19 +393,10 @@ const NftStakingPage = () => {
                       mb={2}
                     />
                     <Text>NFT #{tokenId}</Text>
-                    <Checkbox
-                      isChecked={selectedTokenIds.includes(tokenId)}
-                      onChange={() => handleTokenSelection(tokenId)}
-                    >
-                      Select
-                    </Checkbox>
                   </Box>
                 </GridItem>
               ))}
             </Grid>
-            <Button mt={4} colorScheme="green" onClick={stakeNFTs}>
-              Stake Selected NFTs
-            </Button>
           </Box>
 
           {/* Staked NFTs */}
@@ -457,45 +411,29 @@ const NftStakingPage = () => {
                       alt={`NFT ${tokenId}`}
                       mb={2}
                     />
-                    <Text>NFT #{tokenId}</Text>
-                    <Checkbox
-                      isChecked={selectedTokenIds.includes(tokenId)}
-                      onChange={() => handleTokenSelection(tokenId)}
-                    >
-                      Select
-                    </Checkbox>
+                    <Text>NFT Staked</Text>
                   </Box>
                 </GridItem>
               ))}
             </Grid>
-            <Button mt={4} colorScheme="orange" onClick={withdrawNFTs}>
-              Unstake Selected NFTs
-            </Button>
-            <Text mt={6}><strong>Unstake your NFTs to Claim Rewards</strong></Text>
-            
           </Box>
         </Flex>
 
-                  <Flex justifyContent="space-between" mt={8}>
-                    <Box>
-                      <Link href={`${baseScanUrl}address/${contractAddress}`} isExternal color="white" fontWeight="bold">
-                        View Staking Contract on BaseScan
-                      </Link>
-                    </Box>
-                    <Box>
-                      <Link href={`${baseScanUrl}token/${rewardTokenAddress}`} isExternal color="white" fontWeight="bold">
-                        View Reward Token on BaseScan
-                      </Link>
-                    </Box>
-                  </Flex>
-
-
-
+        <Flex justifyContent="space-between" mt={8}>
+          <Box>
+            <Link href={`${baseScanUrl}address/${contractAddress}`} isExternal color="white" fontWeight="bold">
+              View Staking Contract on BaseScan
+            </Link>
+          </Box>
+          <Box>
+            <Link href={`${baseScanUrl}token/${rewardTokenAddress}`} isExternal color="white" fontWeight="bold">
+              View Reward Token on BaseScan
+            </Link>
+          </Box>
+        </Flex>
       </Box>
 
-              <Box p={6} mt={6} minH="250px" bg="rgba(0, 0, 0, 0.65)">
-
-            </Box>
+      <Box p={6} mt={6} minH="250px" bg="rgba(0, 0, 0, 0.65)"></Box>
     </Box>
   );
 };
