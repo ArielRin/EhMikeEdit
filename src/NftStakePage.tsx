@@ -472,11 +472,12 @@ const NftStakingPage = () => {
               Unstake Selected NFTs
             </Button>
             <Text mt={6}><strong>Unstake your NFTs to Claim Rewards</strong></Text>
-            
+
           </Box>
         </Flex>
+        <Box gap={6} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md" mt={8}>
 
-                  <Flex justifyContent="space-between" mt={8}>
+                  <Flex   justifyContent="space-between" mt={8}>
                     <Box>
                       <Link href={`${baseScanUrl}address/${contractAddress}`} isExternal color="white" fontWeight="bold">
                         View Staking Contract on BaseScan
@@ -488,6 +489,7 @@ const NftStakingPage = () => {
                       </Link>
                     </Box>
                   </Flex>
+                </Box>
 
 
 

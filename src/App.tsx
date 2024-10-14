@@ -14,7 +14,7 @@ import DeployPoolPage from './DeployPoolPage';
 import AdminDeployPoolPage from './AdminDeployPoolPage';
 import DeployPoolAPI from './DeployPoolAPI';
 import NftStakePage from './NftStakePage';
-import NftStakeStats from './NftStakeStats'; 
+import NftStakeStats from './NftStakeStats';
 import Stakecalc from './Stakecalc';
 
 

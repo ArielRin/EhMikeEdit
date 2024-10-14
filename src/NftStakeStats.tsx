@@ -308,19 +308,19 @@ const NftStakingPage = () => {
             <w3m-button />
           </Flex>
         </Flex>
-        <Heading p={2} bg="rgba(0, 0, 0, 0.65)" size="md">
+        <Heading p={2}  bg="rgba(0, 0, 0, 0.65)" size="md">
           Stake Foxy NFT - Earn $RYIU
         </Heading>
 
         {/* Staking Stats */}
-        <Box mt={6} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
-          <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6}>
+        <Box mt={4} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
+          <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={2}>
             {/* Pending Reward */}
-            <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+            <Box p={4} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
+              <Text fontSize="xl" fontWeight="bold" mb={4}>
                 Pending Reward
               </Text>
-              <Text fontSize="4xl" fontWeight="bold" color="white">
+              <Text fontSize="3xl" fontWeight="bold" color="white">
                 {pendingReward}
               </Text>
               <Text fontSize="lg" mt={2}>
@@ -328,36 +328,36 @@ const NftStakingPage = () => {
               </Text>
             </Box>
 
-            {/* Blocks Remaining */}
-            <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-              <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                Blocks Remaining
-              </Text>
-              <Text fontSize="4xl" fontWeight="bold" color="white">
-                {remainingBlocks}
-              </Text>
-              <Text fontSize="lg" mt={2}>Until End of Staking</Text>
-            </Box>
-
             {/* User Staked Tokens Count */}
             <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+              <Text fontSize="xl" fontWeight="bold" mb={4}>
                 Your Staked NFTs
               </Text>
-              <Text fontSize="4xl" fontWeight="bold" color="white">
+              <Text fontSize="3xl" fontWeight="bold" color="white">
                 {userStakedTokenCount}
               </Text>
               <Text fontSize="lg" mt={2}>NFTs Staked</Text>
             </Box>
+
+            {/* Blocks Remaining */}
+            <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
+              <Text fontSize="xl" fontWeight="bold" mb={4}>
+                Blocks Remaining
+              </Text>
+              <Text fontSize="3xl" fontWeight="bold" color="white">
+                {remainingBlocks}
+              </Text>
+              <Text fontSize="lg" mt={2}>Until End of Staking</Text>
+            </Box>
           </Grid>
 
-          <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mt={6}>
+          <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={2} mt={2}>
             {/* Remaining Rewards */}
             <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+              <Text fontSize="xl" fontWeight="bold" mb={4}>
                 Remaining Rewards to Distribute
               </Text>
-              <Text fontSize="4xl" fontWeight="bold" color="white">
+              <Text fontSize="3xl" fontWeight="bold" color="white">
                 {parseFloat(rewardTokenBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </Text>
               <Text fontSize="lg" mt={2}>
@@ -367,10 +367,10 @@ const NftStakingPage = () => {
 
             {/* Reward Token Price */}
             <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-              <Text fontSize="2xl" fontWeight="bold" mb={4}>
+              <Text fontSize="xl" fontWeight="bold" mb={4}>
                 $RYIU Token Price
               </Text>
-              <Text fontSize="4xl" fontWeight="bold" color="white">
+              <Text fontSize="3xl" fontWeight="bold" color="white">
                 ${rewardTokenPrice.toFixed(8)}
               </Text>
               <Text fontSize="lg" mt={2}>USD per Token</Text>
@@ -379,7 +379,7 @@ const NftStakingPage = () => {
         </Box>
 
         {/* Flex container for Unstaked and Staked NFTs */}
-        <Flex direction={{ base: "column", md: "row" }} gap={6} mt={6}>
+        <Flex direction={{ base: "column", md: "row" }} gap={2} mt={2}>
           {/* Unstaked NFTs */}
           <Box flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
             <Heading size="md" mb={4}>Your Unstaked NFTs</Heading>
@@ -419,18 +419,23 @@ const NftStakingPage = () => {
           </Box>
         </Flex>
 
-        <Flex justifyContent="space-between" mt={8}>
-          <Box>
-            <Link href={`${baseScanUrl}address/${contractAddress}`} isExternal color="white" fontWeight="bold">
-              View Staking Contract on BaseScan
-            </Link>
-          </Box>
-          <Box>
-            <Link href={`${baseScanUrl}token/${rewardTokenAddress}`} isExternal color="white" fontWeight="bold">
-              View Reward Token on BaseScan
-            </Link>
-          </Box>
-        </Flex>
+
+        <Box gap={6} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md" mt={8}>
+
+                  <Flex   justifyContent="space-between" mt={8}>
+                    <Box>
+                      <Link href={`${baseScanUrl}address/${contractAddress}`} isExternal color="white" fontWeight="bold">
+                        View Staking Contract on BaseScan
+                      </Link>
+                    </Box>
+                    <Box>
+                      <Link href={`${baseScanUrl}token/${rewardTokenAddress}`} isExternal color="white" fontWeight="bold">
+                        View Reward Token on BaseScan
+                      </Link>
+                    </Box>
+                  </Flex>
+                </Box>
+
       </Box>
 
       <Box p={6} mt={6} minH="250px" bg="rgba(0, 0, 0, 0.65)"></Box>

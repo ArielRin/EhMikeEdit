@@ -6,9 +6,9 @@ import { Link as ChakraLink } from '@chakra-ui/react';
 import Footer from './Components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitter as faXTwitter, faTelegram } from '@fortawesome/free-brands-svg-icons';
-import { faGlobe, faChartLine } from '@fortawesome/free-solid-svg-icons';
 import ViewPresale from './Presalecomponent';
 import Presalecomponent from './Presalecomponent';
+import './1styles.css'; // Make sure this points to your CSS file
 
 const imagePaths = ['/images/logobwb.png'];
 const imagePathsBabyDoge = ['/images/logobwb.png'];
@@ -31,29 +31,27 @@ const NewPage = () => {
     return () => clearInterval(intervalIdBabyDoge);
   }, []);
 
-  const glow = keyframes`
-    from {
-      box-shadow: 0 0 10px white;
-    }
-    to {
-      box-shadow: 0 0 20px white, 0 0 30px white, 0 0 40px white, 0 0 50px white;
-    }
-  `;
-
-  const glowStyle = css`
-    animation: ${glow} 1.5s ease-in-out infinite alternate;
-  `;
-
   return (
     <>
       <Box position="relative" flex={1} p={0} m={0} display="flex" flexDirection="column" color="white">
         <Box flex={1} p={0} m={0} bg="rgba(0, 0, 0, 0.65)" display="flex" flexDirection="column" color="white">
+          <Box flex={1} p={4} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
+            {/* Insert the animated background */}
+            <ul className="circles">
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+            </ul>
 
-
-          <Box flex={1} p={0} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
             <Flex flex={1} m={2} p={7} borderRadius="2xl" textAlign="center" bg="rgba(0, 0, 0, 0.61)" border="2px" borderColor="#fff" flexWrap="wrap" alignItems="center" justifyContent="center" h="auto" flexDirection="column" bgImage="/images/b3.png" bgSize="cover" bgPosition="left">
-
-              <Flex mt="15px" mb="15px" justify="center" align="center" gap={4}>
+              <Flex  mt="15px" mb="15px" justify="center" align="center" gap={4}>
                 <ChakraLink href="https://babydoge20.com/" isExternal>
                   Home
                 </ChakraLink>
@@ -71,11 +69,11 @@ const NewPage = () => {
                 Welcome to BABYDOGE on Base! Grab your Presale tokens while they last!
               </Text>
               <Image src="/images/logobwb.png" alt="header" mx="auto" width="30%" minW="200px" mt="28px" />
-
-                      <Flex align="center">
-                        <w3m-button />
-                      </Flex>
+              <Flex align="center">
+                <w3m-button />
+              </Flex>
             </Flex>
+
             <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
               <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff" bg="rgba(0, 0, 0, 0.61)" bgImage="/images/b2.png" bgSize="cover" bgPosition="left">
                 <RouterLink to="/introBABY">
@@ -95,9 +93,7 @@ const NewPage = () => {
                 </RouterLink>
               </Box>
 
-
-
-              <Box flex={1} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff">
+              <Box m={2} maxW="480px" flex={1} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff">
                 <Presalecomponent />
               </Box>
             </Flex>

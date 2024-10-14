@@ -8,6 +8,7 @@ import { useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/rea
 import presaleAbi from './Abi/presaleAbi.json';
 
 const USDT_ADDRESS = import.meta.env.VITE_USDT_ADDRESS as string;
+// 0x63df0F5B0D4F8DdF77dC072C2CdE9c6C828c0De6
 const PRESALE_CONTRACT_ADDRESS = import.meta.env.VITE_PRESALE_CONTRACT_ADDRESS as string;
 const PRESALE_TOKEN_ADDRESS = import.meta.env.VITE_PRESALE_TOKEN_ADDRESS as string;
 const RPC_URL = import.meta.env.VITE_RPC_URL as string;
@@ -318,6 +319,9 @@ const PresaleComponent: React.FC = () => {
         <Box textAlign="center" mb={4}>
           <Image src="images/logobwb.png" alt="header" mx="auto" width="70%" minW="250px" mt="28px" />
           <Text fontSize="sm" mb={4} mt={4} color="gray.300">{PRESALE_TOKEN_ADDRESS}</Text>
+          <Box display="flex" justifyContent="center" alignItems="center" mx="auto">
+            <w3m-button />
+          </Box>
 
         {!isPresaleCancelled && (
             <>
