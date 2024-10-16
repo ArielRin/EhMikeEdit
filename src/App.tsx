@@ -16,6 +16,7 @@ import DeployPoolAPI from './DeployPoolAPI';
 import NftStakePage from './NftStakePage';
 import NftStakeStats from './NftStakeStats';
 import Stakecalc from './Stakecalc';
+import AllPresales from './AllPresales';
 
 
 import { ethers, BrowserProvider } from 'ethers';
@@ -151,6 +152,7 @@ const modal = createWeb3Modal({
           <Route path="/stake" element={<NftStakePage />} />
           <Route path="/nftstats" element={<NftStakeStats />} />
           <Route path="/stakecalc" element={<Stakecalc />} />
+          <Route path="/allpresales" element={<AllPresales />} />
       </Routes>
     </Router>
   );

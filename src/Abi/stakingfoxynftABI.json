@@ -2,88 +2,111 @@
 	{
 		"inputs": [
 			{
-				"components": [
-					{
-						"internalType": "address",
-						"name": "stakedToken",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "rewardToken",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "admin",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "projectTaxAddress",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "taxAddress",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "rewardPerBlock",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "startBlock",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "bonusEndBlock",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "poolLimitPerUser",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "tax",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "projectTax",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct RewardPoolConfiguration",
-				"name": "config",
-				"type": "tuple"
+				"internalType": "address",
+				"name": "_presaleTokenAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_USDTAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_chainlinkPricefeedEth",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_totalTokensOfferedPresale",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_softCapUSD",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_totalTokens",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_presaleEndDate",
+				"type": "uint256"
 			}
 		],
-		"stateMutability": "payable",
+		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},
 	{
 		"anonymous": false,
+		"inputs": [],
+		"name": "ClaimEnabled",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [],
+		"name": "PresaleCancelled",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "address",
-				"name": "tokenRecovered",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "newPresalePercentage",
+				"type": "uint256"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "tokenId",
+				"name": "newTokensToRelease",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newOwnerBoostedContribution",
 				"type": "uint256"
 			}
 		],
-		"name": "AdminTokenRecovery",
+		"name": "PresaleParametersUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "paused",
+				"type": "bool"
+			}
+		],
+		"name": "PresalePaused",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "totalContributionsUSD",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "totalTokensOfferedPresaleDistributed",
+				"type": "uint256"
+			}
+		],
+		"name": "PresaleSuccessful",
 		"type": "event"
 	},
 	{
@@ -97,12 +120,12 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256[]",
-				"name": "tokenIds",
-				"type": "uint256[]"
+				"internalType": "uint256",
+				"name": "amountRefunded",
+				"type": "uint256"
 			}
 		],
-		"name": "Deposit",
+		"name": "RefundIssued",
 		"type": "event"
 	},
 	{
@@ -111,30 +134,17 @@
 			{
 				"indexed": true,
 				"internalType": "address",
-				"name": "user",
+				"name": "claimer",
 				"type": "address"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "tokenId",
+				"name": "amountClaimed",
 				"type": "uint256"
 			}
 		],
-		"name": "EmergencyWithdraw",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "poolLimitPerUser",
-				"type": "uint256"
-			}
-		],
-		"name": "NewPoolLimit",
+		"name": "TokensClaimed",
 		"type": "event"
 	},
 	{
@@ -143,72 +153,27 @@
 			{
 				"indexed": true,
 				"internalType": "address",
-				"name": "previousOwner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "Registered",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "blockNumber",
-				"type": "uint256"
-			}
-		],
-		"name": "RewardsStop",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
+				"name": "buyer",
 				"type": "address"
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256[]",
-				"name": "tokenIds",
-				"type": "uint256[]"
+				"internalType": "uint256",
+				"name": "amountContributed",
+				"type": "uint256"
 			}
 		],
-		"name": "Withdraw",
+		"name": "TokensPurchased",
 		"type": "event"
 	},
 	{
 		"inputs": [],
-		"name": "PRECISION_FACTOR",
+		"name": "USDTAddress",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "address",
 				"name": "",
-				"type": "uint256"
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -216,12 +181,19 @@
 	},
 	{
 		"inputs": [],
-		"name": "accTokenPerShare",
+		"name": "cancelPresale",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "chainlinkPricefeedEth",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "address",
 				"name": "",
-				"type": "uint256"
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -229,26 +201,27 @@
 	},
 	{
 		"inputs": [],
-		"name": "bonusEndBlock",
+		"name": "claimEnabled",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "bool",
 				"name": "",
-				"type": "uint256"
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256[]",
-				"name": "tokenIds",
-				"type": "uint256[]"
-			}
-		],
-		"name": "deposit",
+		"inputs": [],
+		"name": "claimTokens",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "contributeWithETH",
 		"outputs": [],
 		"stateMutability": "payable",
 		"type": "function"
@@ -257,11 +230,11 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_amount",
+				"name": "usdtAmount",
 				"type": "uint256"
 			}
 		],
-		"name": "emergencyRewardWithdraw",
+		"name": "contributeWithUSDT",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -270,11 +243,36 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "tokenId",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "emergencyWithdraw",
+		"name": "contributors",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "contributorAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "totalContributionUSD",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "enableClaimTokens",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "endPresale",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -283,27 +281,12 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "account",
+				"name": "",
 				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "size",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "cursor",
-				"type": "uint256"
 			}
 		],
-		"name": "getUserStakedTokens",
+		"name": "ethContributions",
 		"outputs": [
-			{
-				"internalType": "uint256[]",
-				"name": "",
-				"type": "uint256[]"
-			},
 			{
 				"internalType": "uint256",
 				"name": "",
@@ -316,12 +299,12 @@
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "ethAmount",
+				"type": "uint256"
 			}
 		],
-		"name": "getUserStakedTokensCount",
+		"name": "ethToUSD",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -334,31 +317,24 @@
 	},
 	{
 		"inputs": [],
-		"name": "hasUserLimit",
+		"name": "getContributors",
 		"outputs": [
 			{
-				"internalType": "bool",
+				"components": [
+					{
+						"internalType": "address",
+						"name": "contributorAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalContributionUSD",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct Presale.Contributor[]",
 				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "isRegistered",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
+				"type": "tuple[]"
 			}
 		],
 		"stateMutability": "view",
@@ -366,7 +342,20 @@
 	},
 	{
 		"inputs": [],
-		"name": "lastRewardBlock",
+		"name": "getLatestETHPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getPresaleTokenBalance",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -383,32 +372,17 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes",
-				"name": "",
-				"type": "bytes"
 			}
 		],
-		"name": "onERC721Received",
+		"name": "isContributor",
 		"outputs": [
 			{
-				"internalType": "bytes4",
+				"internalType": "bool",
 				"name": "",
-				"type": "bytes4"
+				"type": "bool"
 			}
 		],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -425,14 +399,8 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_user",
-				"type": "address"
-			}
-		],
-		"name": "pendingReward",
+		"inputs": [],
+		"name": "ownerBoostedContribution",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -445,236 +413,168 @@
 	},
 	{
 		"inputs": [],
-		"name": "poolFactory",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "poolLimitPerUser",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_tokenAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_tokenAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "recoverWrongTokens",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "register",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "registrationFee",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "registrationFeeAddress",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "rewardPerBlock",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "rewardToken",
-		"outputs": [
-			{
-				"internalType": "contract IBEP20",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "stakedToken",
-		"outputs": [
-			{
-				"internalType": "contract IERC721",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "startBlock",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "stopReward",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "tokensStaked",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bool",
-				"name": "_hasUserLimit",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_poolLimitPerUser",
-				"type": "uint256"
-			}
-		],
-		"name": "updatePoolLimitPerUser",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "vaultAddress",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "vaultConfiguration",
+		"name": "presaleCancelled",
 		"outputs": [
 			{
 				"internalType": "bool",
-				"name": "requiresRegistration",
+				"name": "",
 				"type": "bool"
-			},
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "presaleEndDate",
+		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "startDepositBlock",
+				"name": "",
 				"type": "uint256"
-			},
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "presalePaused",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "presalePercentage",
+		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "endDepositBlock",
+				"name": "",
 				"type": "uint256"
-			},
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "presaleSuccessful",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "presaleTokenAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "presaleTokenBalance",
+		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "maxTokensStaked",
+				"name": "",
 				"type": "uint256"
-			},
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "refund",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "softCapUSD",
+		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "maxTokensPerUser",
+				"name": "",
 				"type": "uint256"
-			},
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "togglePresalePause",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "tokensToRelease",
+		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "vestDuration",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalContributionsUSD",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalTokens",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalTokensOfferedPresale",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
 				"type": "uint256"
 			}
 		],
@@ -684,12 +584,74 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256[]",
-				"name": "tokenIds",
-				"type": "uint256[]"
+				"internalType": "uint256",
+				"name": "newPresalePercentage",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newTokensToRelease",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newOwnerBoostedContribution",
+				"type": "uint256"
 			}
 		],
-		"name": "withdraw",
+		"name": "updatePresaleParameters",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "usdtContributions",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "usdtAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "usdtToUSD",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "withdrawContributions",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "withdrawRemainingTokens",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

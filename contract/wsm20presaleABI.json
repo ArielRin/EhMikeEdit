@@ -1,19 +1,5 @@
 [
 	{
-		"inputs": [],
-		"name": "cancelPresale",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "claimTokens",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -39,6 +25,16 @@
 				"internalType": "uint256",
 				"name": "_softCapUSD",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_totalTokens",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_presaleEndDate",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -49,6 +45,13 @@
 		"inputs": [],
 		"name": "ClaimEnabled",
 		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "claimTokens",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -88,6 +91,31 @@
 		"anonymous": false,
 		"inputs": [],
 		"name": "PresaleCancelled",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newPresalePercentage",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newTokensToRelease",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newOwnerBoostedContribution",
+				"type": "uint256"
+			}
+		],
+		"name": "PresaleParametersUpdated",
 		"type": "event"
 	},
 	{
@@ -192,6 +220,29 @@
 		],
 		"name": "TokensPurchased",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "newPresalePercentage",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newTokensToRelease",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newOwnerBoostedContribution",
+				"type": "uint256"
+			}
+		],
+		"name": "updatePresaleParameters",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -334,6 +385,19 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "getPresaleTokenBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -367,6 +431,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "ownerBoostedContribution",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "presaleCancelled",
 		"outputs": [
 			{
@@ -380,12 +457,38 @@
 	},
 	{
 		"inputs": [],
+		"name": "presaleEndDate",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "presalePaused",
 		"outputs": [
 			{
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "presalePercentage",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -445,7 +548,33 @@
 	},
 	{
 		"inputs": [],
+		"name": "tokensToRelease",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "totalContributionsUSD",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalTokens",
 		"outputs": [
 			{
 				"internalType": "uint256",

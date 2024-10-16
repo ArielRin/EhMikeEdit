@@ -68,10 +68,6 @@ const NewPage = () => {
               <Text mb={2} ml={4} textAlign="left" fontSize="lg" fontWeight="bolder">
                 Welcome to BABYDOGE on Base! Grab your Presale tokens while they last!
               </Text>
-              <Image src="/images/logobwb.png" alt="header" mx="auto" width="30%" minW="200px" mt="28px" />
-              <Flex align="center">
-                <w3m-button />
-              </Flex>
             </Flex>
 
             <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
