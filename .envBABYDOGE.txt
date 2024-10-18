@@ -1,2 +1,0 @@
-VITE_PROJECT_ID=10dba5155eb9cfcbcb6d81f760b3897f
-
