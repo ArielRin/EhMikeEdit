@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNFTCollection } from "@thirdweb-dev/react";
 import { ethers, Contract } from 'ethers';
 import {
   Box,
@@ -172,27 +173,32 @@ useEffect(() => {
     setRewardTokenBalanceUSD(rewardTokenBalanceUSDValue);
   };
 
-  const fetchOwnedNFTs = async (nftContract: Contract) => {
+  const fetchOwnedNFTs = async () => {
   if (!nftContract || !address) return;
 
   try {
-    const balance = await nftContract.balanceOf(address);
-    const ownedTokens: number[] = [];
+    // Fetch all NFTs in the contract
+    const allNfts = await nftContract.getAll();
 
-    for (let i = 0; i < balance; i++) {
-      const tokenId = await nftContract.tokenOfOwnerByIndex(address, i);
-      ownedTokens.push(Number(tokenId));
-      const imageUrl = await fetchMetadataForNFT(tokenId);
-      setNftImages(prev => ({ ...prev, [tokenId]: imageUrl }));
+    // Filter NFTs owned by the specific address
+    const ownedNfts = allNfts.filter(nft => nft.owner === address);
+
+    const ownedTokens: number[] = ownedNfts.map((nft) => nft.metadata.id.toNumber());
+    setOwnedNFTs(ownedTokens);
+
+    // Create a mapping of token IDs to image URLs from your local folder
+    const imageMap: { [tokenId: number]: string | null } = {};
+    for (const tokenId of ownedTokens) {
+      const imageUrl = `/NFTIMAGES/${tokenId}.png`; // Assumes images are named by tokenId in PNG format.
+      imageMap[tokenId] = imageUrl;
     }
 
-    // Filter out NFTs that are already staked
-    const unstakedNFTs = ownedTokens.filter(token => !userStakedTokens.includes(token));
-    setOwnedNFTs(unstakedNFTs);
+    setNftImages(imageMap);
   } catch (error) {
     console.error("Error fetching owned NFTs:", error);
   }
 };
+
 
 
 const fetchMetadataForNFT = async (tokenId: number) => {

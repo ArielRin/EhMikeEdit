@@ -386,19 +386,50 @@ try {
               <w3m-button />
             </Flex>
           </Flex>
-          <Heading p={2} bg="rgba(0, 0, 0, 0.65)" size="md">
-            Stake Foxy NFT - Earn $RYIU
-          </Heading>
+          <Box mt={2} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} py={2} borderRadius="md">
+
+          <Text fontSize="md" fontWeight="bold" color="white">
+          Stake Foxy NFT - Earn $RYIU
+          </Text>
+          </Box>
+
+
+
+                    {/* Staked NFTs */}
+                    <Box mt={2} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
+                      <Heading size="md" mb={4}>Your Staked NFTs</Heading>
+                      <Grid templateColumns="repeat(4, 1fr)" gap={2}>
+                        {userStakedTokens.map(tokenId => (
+                          <GridItem key={tokenId}>
+                            <Box border="1px solid gray" borderRadius="2xl" p={4} textAlign="center">
+                              <Image
+                                src={nftImages[tokenId] || '/placeholder.png'}
+                                alt={`NFT ${tokenId}`}
+                                mb={2}
+                              />
+
+                            </Box>
+                          </GridItem>
+                        ))}
+                      </Grid>
+
+                      <Box p={6} mt={2}  textAlign="center">
+                        <Link   href="https://unity-ventures.com/stake/nft" isExternal color="white" fontSize="sm" fontWeight="bold">
+                          Visit Unity Ventures Here to Stake / Unstake your Foxy NFTs
+                        </Link>
+                      </Box>
+
+                    </Box>
 
           {/* Staking Stats */}
           <Box mt={2} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
             <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={2}>
               {/* Pending Reward */}
               <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                <Text fontSize="lg" fontWeight="bold" mb={4}>
                   Pending Reward
                 </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
+                <Text fontSize="2xl" fontWeight="bold" color="white">
                   {pendingReward}
                 </Text>
                 <Text fontSize="lg" mt={2}>
@@ -408,10 +439,10 @@ try {
 
               {/* Blocks Remaining */}
               <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                <Text fontSize="lg" fontWeight="bold" mb={4}>
                   Blocks Remaining
                 </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
+                <Text fontSize="2xl" fontWeight="bold" color="white">
                   {remainingBlocks}
                 </Text>
                 <Text fontSize="lg" mt={2}>Until End of Staking</Text>
@@ -419,10 +450,10 @@ try {
 
               {/* User Staked Tokens Count */}
               <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                <Text fontSize="lg" fontWeight="bold" mb={4}>
                   Your Staked NFTs
                 </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
+                <Text fontSize="2xl" fontWeight="bold" color="white">
                   {userStakedTokenCount}
                 </Text>
                 <Text fontSize="lg" mt={2}>NFTs Staked</Text>
@@ -436,10 +467,10 @@ try {
             <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={2} mt={2}>
               {/* Remaining Rewards */}
               <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                <Text fontSize="lg" fontWeight="bold" mb={4}>
                   Remaining Rewards to Distribute
                 </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
+                <Text fontSize="2xl" fontWeight="bold" color="white">
                   {parseFloat(rewardTokenBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </Text>
                 <Text fontSize="lg" mt={2}>
@@ -453,10 +484,10 @@ try {
 
               {/* Reward Token Price */}
               <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
+                <Text fontSize="lg" fontWeight="bold" mb={4}>
                   $RYIU Token Price
                 </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
+                <Text fontSize="2xl" fontWeight="bold" color="white">
                   ${rewardTokenPrice.toFixed(8)}
                 </Text>
                 <Text fontSize="lg" mt={2}>USD per Token</Text>
@@ -471,26 +502,6 @@ try {
         {/* Flex container for Unstaked and Staked NFTs */}
         <Flex direction={{ base: "column", md: "row" }} gap={2} mt={2}>
 
-
-          {/* Staked NFTs */}
-          <Box flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
-            <Heading size="md" mb={4}>Your Staked NFTs</Heading>
-            <Grid templateColumns="repeat(3, 1fr)" gap={2}>
-              {userStakedTokens.map(tokenId => (
-                <GridItem key={tokenId}>
-                  <Box border="1px solid gray" borderRadius="2xl" p={4} textAlign="center">
-                    <Image
-                      src={nftImages[tokenId] || '/placeholder.png'}
-                      alt={`NFT ${tokenId}`}
-                      mb={2}
-                    />
-
-                  </Box>
-                </GridItem>
-              ))}
-            </Grid>
-
-          </Box>
         </Flex>
         <Box gap={2} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md" mt={8}>
 
