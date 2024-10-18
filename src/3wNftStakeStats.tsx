@@ -391,8 +391,8 @@ try {
           </Heading>
 
           {/* Staking Stats */}
-          <Box mt={6} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
-            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6}>
+          <Box mt={2} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
+            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={2}>
               {/* Pending Reward */}
               <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" mb={4}>
@@ -433,7 +433,7 @@ try {
               </Box>
             </Grid>
 
-            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mt={6}>
+            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={2} mt={2}>
               {/* Remaining Rewards */}
               <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" mb={4}>
@@ -469,32 +469,13 @@ try {
             </Grid>
           </Box>
         {/* Flex container for Unstaked and Staked NFTs */}
-        <Flex direction={{ base: "column", md: "row" }} gap={6} mt={6}>
+        <Flex direction={{ base: "column", md: "row" }} gap={2} mt={2}>
 
-          {/* Unstaked NFTs */}
-          <Box flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
-            <Heading size="md" mb={4}>Your Unstaked NFTs</Heading>
-            <Grid templateColumns="repeat(3, 1fr)" gap={6}>
-              {ownedNFTs.map(tokenId => (
-                <GridItem key={tokenId}>
-                  <Box border="1px solid gray" borderRadius="2xl" p={4} textAlign="center">
-                    <Image
-                      src={nftImages[tokenId] || '/placeholder.png'}
-                      alt={`NFT ${tokenId}`}
-                      mb={2}
-                    />
-                    <Text>NFT #{tokenId}</Text>
-
-                  </Box>
-                </GridItem>
-              ))}
-            </Grid>
-          </Box>
 
           {/* Staked NFTs */}
           <Box flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
             <Heading size="md" mb={4}>Your Staked NFTs</Heading>
-            <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+            <Grid templateColumns="repeat(3, 1fr)" gap={2}>
               {userStakedTokens.map(tokenId => (
                 <GridItem key={tokenId}>
                   <Box border="1px solid gray" borderRadius="2xl" p={4} textAlign="center">
@@ -503,7 +484,6 @@ try {
                       alt={`NFT ${tokenId}`}
                       mb={2}
                     />
-                    <Text>NFT #{tokenId}</Text>
 
                   </Box>
                 </GridItem>
@@ -512,7 +492,7 @@ try {
 
           </Box>
         </Flex>
-        <Box gap={6} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md" mt={8}>
+        <Box gap={2} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md" mt={8}>
 
                   <Flex   justifyContent="space-between" mt={8}>
                     <Box>
@@ -532,7 +512,7 @@ try {
 
       </Box>
 
-              <Box p={6} mt={6} minH="250px" bg="rgba(0, 0, 0, 0.65)">
+              <Box p={6} mt={2} minH="250px" bg="rgba(0, 0, 0, 0.65)">
 
             </Box>
     </Box>

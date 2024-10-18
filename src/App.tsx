@@ -31,7 +31,6 @@ const chains = [
   },
 
   // added testnets for dev recreation of joeys frontend works
-    { chainId: 84532, name: 'Base Sepolia', currency: 'ETH', explorerUrl: 'https://sepolia.basescan.org', rpcUrl: 'https://sepolia.base.org' }
 
 ];
 
@@ -58,15 +57,14 @@ const modal = createWeb3Modal({
   enableAnalytics: true,
   themeMode: 'dark',
   themeVariables: {
-    '--w3m-color-mix': '#2854f3',
-    '--w3m-accent': '#dc9710',
+    '--w3m-color-mix': '#dc9710',
+    '--w3m-accent': '#4f613e',
     '--w3m-color-mix-strength': 22
 
   },
   chainImages: {
       8453: '/images/base.png',
 
-      84532: '/images/baset.png',
     },
   tokens: {
     8453: {
