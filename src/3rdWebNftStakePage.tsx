@@ -17,17 +17,17 @@ import { useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/rea
 import contractABI from './Abi/stakingfoxynftABI.json'; // Staking Contract ABI
 import erc721ABI from './Abi/nftAbi.json'; // ERC-721 ABI for NFTs
 import erc20ABI from './Abi/erc20Abi.json'; // ERC-20 ABI for Reward Tokens
-// 0x9649CF804286bB163659b4fE2fa134C0CB85a662 next to use with propper decimal block rewards
-const contractAddress = "0x9649CF804286bB163659b4fE2fa134C0CB85a662"; // Staking contract address
-const nftContractAddress = "0x0600Fd27CA4ed4bF1539a907EBE8dCE3814042F7"; // NFT contract address
-const rewardTokenAddress = "0xA716C25e30Af41472bd51C92A643861d4Fa28021"; // Reward Token address
+
+const contractAddress = "0xBbd8ddBe5e0bD078Df0aEb061A30e1325a8087b4"; // Staking contract address
+const nftContractAddress = "0x30928bF970b74fdcd06E5c9A2B31104327A8A514"; // NFT contract address
+const rewardTokenAddress = "0x5Dc2085Fe510Bbaaba2119d71B09c25098caCa3F"; // Reward Token address
 const geckoAPIUrl = "https://api.geckoterminal.com/api/v2/simple/networks/base/token_price/0x5dc2085fe510bbaaba2119d71b09c25098caca3f"; // Gecko Terminal API for reward token price
 const baseScanUrl = "https://basescan.org/";
 const RPC_URL = import.meta.env.VITE_RPC_URL as string;
 
 // Base chain block time (1.9 seconds per block)
 const BLOCK_TIME_SECONDS = 1.9;
-const REWARD_TOKEN_DECIMALS = 18; // Set reward token decimals to 9 for RYIU
+const REWARD_TOKEN_DECIMALS = 9; // Set reward token decimals to 9 for RYIU
 
 const NftStakingPage = () => {
   const [currentBlock, setCurrentBlock] = useState<number>(0);
@@ -123,21 +123,17 @@ useEffect(() => {
     const remaining = Math.max(Number(endBlock) - blockNumber, 0);
     setRemainingBlocks(remaining);
 
+
+
+
+
+
+
+
     const userPendingReward = await stakingContract.pendingReward(address);
     // Adjust the fetch of user pending rewards to use the correct decimals
-const formattedPendingReward = ethers.formatUnits(userPendingReward, REWARD_TOKEN_DECIMALS);
-setPendingReward(formattedPendingReward);
-
-
-
-
-
-
-
-
-
-
-
+    const formattedPendingReward = ethers.formatUnits(userPendingReward, REWARD_TOKEN_DECIMALS);
+    setPendingReward(formattedPendingReward);
 
     const userTokens = await stakingContract.getUserStakedTokens(address, 100, 0);
     setUserStakedTokens(userTokens[0]);
@@ -167,41 +163,56 @@ setPendingReward(formattedPendingReward);
     const formattedRewardTokenBalance = ethers.formatUnits(contractBalance, REWARD_TOKEN_DECIMALS);
     setRewardTokenBalance(formattedRewardTokenBalance);
 
+
+
+
+
     // Calculate remaining tokens in USD
     const rewardTokenBalanceUSDValue = parseFloat(formattedRewardTokenBalance) * rewardTokenPrice;
     setRewardTokenBalanceUSD(rewardTokenBalanceUSDValue);
   };
 
   const fetchOwnedNFTs = async (nftContract: Contract) => {
-    if (!nftContract || !address) return;
+  if (!nftContract || !address) return;
 
+  try {
     const balance = await nftContract.balanceOf(address);
     const ownedTokens: number[] = [];
 
     for (let i = 0; i < balance; i++) {
       const tokenId = await nftContract.tokenOfOwnerByIndex(address, i);
       ownedTokens.push(Number(tokenId));
-      await fetchMetadataForNFT(tokenId);
+      const imageUrl = await fetchMetadataForNFT(tokenId);
+      setNftImages(prev => ({ ...prev, [tokenId]: imageUrl }));
     }
 
-    setOwnedNFTs(ownedTokens.filter(token => !userStakedTokens.includes(token)));
-  };
+    // Filter out NFTs that are already staked
+    const unstakedNFTs = ownedTokens.filter(token => !userStakedTokens.includes(token));
+    setOwnedNFTs(unstakedNFTs);
+  } catch (error) {
+    console.error("Error fetching owned NFTs:", error);
+  }
+};
 
-  const fetchMetadataForNFT = async (tokenId: number) => {
-    try {
-      const imageUrl = `/NFTIMAGES/${tokenId}.png`;
-      const response = await fetch(imageUrl);
 
-      if (!response.ok) {
-        throw new Error("Image not found");
-      }
+const fetchMetadataForNFT = async (tokenId: number) => {
+try {
+  // Example of fetching metadata using an API call or directly from the NFT contract.
+  const metadataUrl = `/NFTIMAGES/${tokenId}.png`; // Change this URL as needed.
+  const response = await fetch(metadataUrl);
 
-      return imageUrl;
-    } catch (error) {
-      console.error("Error fetching image:", error);
-      return null;
-    }
-  };
+  if (!response.ok) {
+    console.error("Image not found for token:", tokenId);
+    return null;
+  }
+
+  return metadataUrl;
+} catch (error) {
+  console.error("Error fetching metadata for token:", tokenId, error);
+  return null;
+}
+};
+
 
   const calculateEstimatedTime = (remainingBlocks: number) => {
     const totalSeconds = remainingBlocks * BLOCK_TIME_SECONDS;
@@ -300,53 +311,58 @@ setPendingReward(formattedPendingReward);
   }
 };
 
-  const withdrawNFTs = async () => {
-    if (!stakingContract || !nftContract || !address || selectedTokenIds.length === 0) {
-      toast({
-        title: "Error",
-        description: "No NFTs selected for withdrawal",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
+const withdrawNFTs = async () => {
+if (!stakingContract || !nftContract || !address || selectedTokenIds.length === 0) {
+  toast({
+    title: "Error",
+    description: "No NFTs selected for withdrawal",
+    status: "error",
+    duration: 5000,
+    isClosable: true,
+  });
+  return;
+}
 
-    try {
-      await approveNFTs();
-      const tokenIds = selectedTokenIds.map(tokenId => ethers.toBigInt(tokenId));
-      const tx = await stakingContract.withdraw(tokenIds);
-      await tx.wait();
+try {
+  await approveNFTs();
 
-      toast({
-        title: "Withdraw Successful",
-        description: `Withdrawn NFT tokens: ${tokenIds.join(", ")}`,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
+  // Ensure selected token IDs are properly formatted if needed
+  const tokenIds = selectedTokenIds.map(tokenId => ethers.toBigInt(tokenId));
+  console.log("Token IDs for withdrawal:", tokenIds);
 
-      setSelectedTokenIds([]);
+  const tx = await stakingContract.withdraw(tokenIds);
+  await tx.wait();
 
-      // Ensure stakingContract and nftContract are not null before fetching data
-      const provider = walletProvider
-        ? new ethers.BrowserProvider(walletProvider as ethers.Eip1193Provider)
-        : new ethers.JsonRpcProvider(RPC_URL);
+  toast({
+    title: "Withdraw Successful",
+    description: `Withdrawn NFT tokens: ${tokenIds.join(", ")}`,
+    status: "success",
+    duration: 5000,
+    isClosable: true,
+  });
 
-      if (stakingContract && nftContract) {
-        await fetchContractData(stakingContract, nftContract, provider);
-      }
-    } catch (error) {
-      console.error("Error withdrawing NFTs:", error);
-      toast({
-        title: "Error",
-        description: `Failed to withdraw NFTs: ${error instanceof Error ? error.message : "Unknown error"}`,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-    };
+  setSelectedTokenIds([]);
+
+  // Refresh contract data if contracts are not null
+  const provider = walletProvider
+    ? new ethers.BrowserProvider(walletProvider as ethers.Eip1193Provider)
+    : new ethers.JsonRpcProvider(RPC_URL);
+
+  if (stakingContract && nftContract) {
+    await fetchContractData(stakingContract, nftContract, provider);
+  }
+} catch (error) {
+  console.error("Error withdrawing NFTs:", error);
+  toast({
+    title: "Error",
+    description: `Failed to withdraw NFTs: ${error instanceof Error ? error.message : "Unknown error"}`,
+    status: "error",
+    duration: 5000,
+    isClosable: true,
+  });
+}
+};
+
 
 
   const loadNftImages = async () => {
@@ -397,7 +413,7 @@ setPendingReward(formattedPendingReward);
                   {pendingReward}
                 </Text>
                 <Text fontSize="lg" mt={2}>
-                  (${pendingRewardUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                  ({pendingRewardUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                 </Text>
               </Box>
 
@@ -421,6 +437,10 @@ setPendingReward(formattedPendingReward);
                   {userStakedTokenCount}
                 </Text>
                 <Text fontSize="lg" mt={2}>NFTs Staked</Text>
+
+                                <Text fontSize="8px" mt={0}>
+                                  {nftContractAddress}
+                                </Text>
               </Box>
             </Grid>
 
@@ -436,6 +456,10 @@ setPendingReward(formattedPendingReward);
                 <Text fontSize="lg" mt={2}>
                   (${rewardTokenBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                 </Text>
+
+                <Text fontSize="8px" mt={0}>
+                  {contractAddress}
+                </Text>
               </Box>
 
               {/* Reward Token Price */}
@@ -447,6 +471,11 @@ setPendingReward(formattedPendingReward);
                   ${rewardTokenPrice.toFixed(8)}
                 </Text>
                 <Text fontSize="lg" mt={2}>USD per Token</Text>
+
+
+                <Text fontSize="8px" mt={0}>
+                  {rewardTokenAddress}
+                </Text>
               </Box>
             </Grid>
           </Box>
@@ -457,25 +486,26 @@ setPendingReward(formattedPendingReward);
           <Box flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
             <Heading size="md" mb={4}>Your Unstaked NFTs</Heading>
             <Grid templateColumns="repeat(3, 1fr)" gap={6}>
-              {ownedNFTs.map(tokenId => (
-                <GridItem key={tokenId}>
-                  <Box border="1px solid gray" borderRadius="2xl" p={4} textAlign="center">
-                    <Image
-                      src={nftImages[tokenId] || '/placeholder.png'}
-                      alt={`NFT ${tokenId}`}
-                      mb={2}
-                    />
-                    <Text>NFT #{tokenId}</Text>
-                    <Checkbox
-                      isChecked={selectedTokenIds.includes(tokenId)}
-                      onChange={() => handleTokenSelection(tokenId)}
-                    >
-                      Select
-                    </Checkbox>
-                  </Box>
-                </GridItem>
-              ))}
-            </Grid>
+  {ownedNFTs.map(tokenId => (
+    <GridItem key={tokenId}>
+      <Box border="1px solid gray" borderRadius="2xl" p={4} textAlign="center">
+        <Image
+          src={nftImages[tokenId] || '/placeholder.png'}
+          alt={`NFT ${tokenId}`}
+          mb={2}
+        />
+        <Text>NFT #{tokenId}</Text>
+        <Checkbox
+          isChecked={selectedTokenIds.includes(tokenId)}
+          onChange={() => handleTokenSelection(tokenId)}
+        >
+          Select
+        </Checkbox>
+      </Box>
+    </GridItem>
+  ))}
+</Grid>
+
             <Button mt={4} colorScheme="green" onClick={stakeNFTs}>
               Stake Selected NFTs
             </Button>

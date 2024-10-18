@@ -7,7 +7,7 @@ import { ethers, Contract } from 'ethers';
 import { useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react';
 import presaleAbi from './Abi/presaleAbi.json';
 
-const USDT_ADDRESS = import.meta.env.VITE_USDT_ADDRESS as string;
+const USDT_ADDRESS = import.meta.env.VITE_USDC_ADDRESS as string;
 const PRESALE_CONTRACT_ADDRESS = import.meta.env.VITE_PRESALE_CONTRACT_ADDRESS as string;
 const PRESALE_TOKEN_ADDRESS = import.meta.env.VITE_PRESALE_TOKEN_ADDRESS as string;
 const RPC_URL = import.meta.env.VITE_RPC_URL as string;
@@ -242,8 +242,8 @@ const PresaleComponent: React.FC = () => {
       await tx.wait();
       setUsdtApproval(true);
       toast({
-        title: "USDT Approval Successful",
-        description: `You have successfully approved USDT.`,
+        title: "USDC Approval Successful",
+        description: `You have successfully approved USDC.`,
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -251,8 +251,8 @@ const PresaleComponent: React.FC = () => {
       });
     } catch (error) {
       toast({
-        title: "USDT Approval Failed",
-        description: `There was an error approving USDT.`,
+        title: "USDC Approval Failed",
+        description: `There was an error approving USDC.`,
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -275,8 +275,8 @@ const PresaleComponent: React.FC = () => {
       await tx.wait();
 
       toast({
-        title: "USDT Contribution Successful",
-        description: `You contributed ${usdtAmount} USDT.`,
+        title: "USDC Contribution Successful",
+        description: `You contributed ${usdtAmount} USDC.`,
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -286,8 +286,8 @@ const PresaleComponent: React.FC = () => {
       await fetchUserContributions(contractWithSigner, signer);
     } catch (error) {
       toast({
-        title: "USDT Contribution Failed",
-        description: `There was an error contributing ${usdtAmount} USDT.`,
+        title: "USDC Contribution Failed",
+        description: `There was an error contributing ${usdtAmount} USDC.`,
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -430,8 +430,8 @@ const PresaleComponent: React.FC = () => {
               </Tab>
               <Tab _selected={{ color: 'white', bg: '#2182ff' }}>
                 <Flex alignItems="center">
-                  <Image src="/images/usdt.svg" alt="USDT Icon" boxSize="20px" mr={2} />
-                  <Text color="white">USDT</Text>
+                  <Image src="/images/usdc.png" alt="USDC Icon" boxSize="20px" mr={2} />
+                  <Text color="white">USDC</Text>
                 </Flex>
               </Tab>
               <Tab _selected={{ color: 'white', bg: '#2182ff' }}>
@@ -502,7 +502,7 @@ const PresaleComponent: React.FC = () => {
       borderRadius="3xl"
       onClick={handleClaimOrRefund}
       isDisabled={!isClaimEnabled || expectedTokens === 0}  // Disable if no claim is possible
-      leftIcon={<Image src="/images/claimbd.png" alt="USDT Icon" boxSize="24px" />}  // Add icon
+      leftIcon={<Image src="/images/claimbd.png" alt="USDC Icon" boxSize="24px" />}  // Add icon
     >
       {expectedTokens === 0 ? (
         'No Valid Token Claim'  // Message when claim is not possible
@@ -516,19 +516,19 @@ const PresaleComponent: React.FC = () => {
 </TabPanel>
 
 
-              {/* USDT Contribution Panel */}
+              {/* USDC Contribution Panel */}
               <TabPanel>
                 <Flex flexDirection="column" alignItems="center">
                   <Box width="100%" >
-                    <Text mb={2} fontSize="sm">Enter USDT amount</Text>
+                    <Text mb={2} fontSize="sm">Enter USDC amount</Text>
                     <InputGroup>
                       <InputLeftElement height="100%" display="flex" alignItems="center" pointerEvents="none">
-                        <Image src="/images/usdt.svg" alt="USDT Icon" boxSize="32px" />
+                        <Image src="/images/usdc.png" alt="USDC Icon" boxSize="32px" />
                       </InputLeftElement>
                       <Input
                         bg="white"
                         color="black"
-                        placeholder="Enter USDT amount"
+                        placeholder="Enter USDC amount"
                         size="lg"
                         borderRadius="md"
                         textAlign="right"
@@ -546,7 +546,7 @@ const PresaleComponent: React.FC = () => {
 
 
                       <Text mt={2} textAlign="right" fontSize="sm" width="100%">
-                        Your Balance: {usdtBalance} USDT
+                        Your Balance: {usdtBalance} USDC
                       </Text>
 
                       <Text  mb={4} textAlign="right" fontSize="sm" width="100%">
@@ -557,33 +557,33 @@ const PresaleComponent: React.FC = () => {
                     <Button
                       mt={10}
                       color="white"
-                      bg="#399c00"
+                      bg="blue.500"
                       width="100%"
                       size="lg"
                       borderRadius="3xl"
                       onClick={handleContributeUSDT}
                       isLoading={isContributingUSDT}
                       loadingText="Contributing to presale..."
-                      leftIcon={<Image src="/images/usdt.svg" alt="USDT Icon" boxSize="24px" />}  // Add icon
+                      leftIcon={<Image src="/images/usdc.png" alt="USDC Icon" boxSize="24px" />}  // Add icon
 
                     >
-                      Contribute USDT
+                      Contribute USDC
                     </Button>
                   ) : (
                     <Button
                       mt={10}
                       color="white"
-                      bg="#399c00"
+                      bg="blue.500"
                       width="100%"
                       size="lg"
                       borderRadius="3xl"
                       onClick={approveUSDT}
                       isLoading={isApprovingUSDT}
-                      loadingText="Approving USDT..."
-                      leftIcon={<Image src="/images/usdt.svg" alt="USDT Icon" boxSize="24px" />}  // Add icon
+                      loadingText="Approving USDC..."
+                      leftIcon={<Image src="/images/usdc.png" alt="USDC Icon" boxSize="24px" />}  // Add icon
 
                     >
-                      Approve USDT
+                      Approve USDC
                     </Button>
                   )}
                   <Button
@@ -595,7 +595,7 @@ const PresaleComponent: React.FC = () => {
                     borderRadius="3xl"
                     onClick={handleClaimOrRefund}
                     isDisabled={!isClaimEnabled || expectedTokens === 0}  // Disable if no claim is possible
-                    leftIcon={<Image src="/images/claimbd.png" alt="USDT Icon" boxSize="24px" />}  // Add icon
+                    leftIcon={<Image src="/images/claimbd.png" alt="USDC Icon" boxSize="24px" />}  // Add icon
                   >
                     {expectedTokens === 0 ? (
                       'No Valid Token Claim'  // Message when claim is not possible
@@ -619,8 +619,8 @@ const PresaleComponent: React.FC = () => {
                     <Text>{ethContribution} ETH (${ethContributionInUSD.toFixed(2)} USD)</Text>
                   </Flex>
                   <Flex justifyContent="space-between" mb={2}>
-                    <Text>USDT Contribution:</Text>
-                    <Text>{parseFloat(usdtContribution).toFixed(3)} USDT (${parseFloat(usdtContribution).toFixed(2)} USD)</Text>
+                    <Text>USDC Contribution:</Text>
+                    <Text>{parseFloat(usdtContribution).toFixed(3)} USDC (${parseFloat(usdtContribution).toFixed(2)} USD)</Text>
                   </Flex>
                   <Flex justifyContent="space-between" mb={2}>
                     <Text>Total Contribution in USD:</Text>
@@ -640,7 +640,7 @@ const PresaleComponent: React.FC = () => {
                   borderRadius="3xl"
                   onClick={handleClaimOrRefund}
                   isDisabled={!isClaimEnabled || expectedTokens === 0}  // Disable if no claim is possible
-                  leftIcon={<Image src="/images/claimbd.png" alt="USDT Icon" boxSize="24px" />}  // Add icon
+                  leftIcon={<Image src="/images/claimbd.png" alt="USDC Icon" boxSize="24px" />}  // Add icon
                 >
                   {expectedTokens === 0 ? (
                     'No Valid Token Claim'  // Message when claim is not possible
@@ -667,8 +667,8 @@ const PresaleComponent: React.FC = () => {
                 <Text>{ethContribution} ETH (${ethContributionInUSD.toFixed(2)} USD)</Text>
               </Flex>
               <Flex justifyContent="space-between" mb={2}>
-                <Text>USDT Contribution:</Text>
-                <Text>{parseFloat(usdtContribution).toFixed(3)} USDT (${parseFloat(usdtContribution).toFixed(2)} USD)</Text>
+                <Text>USDC Contribution:</Text>
+                <Text>{parseFloat(usdtContribution).toFixed(3)} USDC (${parseFloat(usdtContribution).toFixed(2)} USD)</Text>
               </Flex>
               <Flex justifyContent="space-between" mb={2}>
                 <Text>Total Contribution in USD:</Text>
@@ -715,8 +715,8 @@ const PresaleComponent: React.FC = () => {
                 <Text>{ethContribution} ETH (${ethContributionInUSD.toFixed(2)} USD)</Text>
               </Flex>
               <Flex justifyContent="space-between" mb={2}>
-                <Text>USDT Contribution:</Text>
-                <Text>{parseFloat(usdtContribution).toFixed(3)} USDT (${parseFloat(usdtContribution).toFixed(2)} USD)</Text>
+                <Text>USDC Contribution:</Text>
+                <Text>{parseFloat(usdtContribution).toFixed(3)} USDC (${parseFloat(usdtContribution).toFixed(2)} USD)</Text>
               </Flex>
               <Flex justifyContent="space-between" mb={4}>
                 <Text>Total Contribution in USD:</Text>

@@ -1,92 +1,118 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Flex, Text, Input, VStack, Divider, useBreakpointValue, HStack
+  Box, Flex, Text, Input, VStack, Divider, HStack, useBreakpointValue
 } from '@chakra-ui/react';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
-const CalculatorPage: React.FC = () => {
-  // Access values from the .env file using import.meta.env
-  const [totalTokens, setTotalTokens] = useState<string>(import.meta.env.VITE_TOTAL_TOKENS || ''); // Total token supply
-  const [percentReleased, setPercentReleased] = useState<number>(parseFloat(import.meta.env.VITE_PERCENT_RELEASED || '0')); // Percentage released at launch
-  const [ethProvided, setEthProvided] = useState<string>(import.meta.env.VITE_ETH_PROVIDED || ''); // Owner boost in USD
-  const [presalePercentage, setPresalePercentage] = useState<number>(parseFloat(import.meta.env.VITE_PRESALE_PERCENTAGE || '0')); // Presale percentage
-  const [presaleEarnings, setPresaleEarnings] = useState<string>(import.meta.env.VITE_PRESALE_EARNINGS || ''); // Presale earnings in USD
-  const [liquidityPercent, setLiquidityPercent] = useState<number>(100); // Liquidity percentage
-  const [minSoftCap, setMinSoftCap] = useState<string>(import.meta.env.VITE_MIN_SOFT_CAP || ''); // Minimum soft cap in USD for presale
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-  // Calculated state values
-  const [presaleTokenValue, setPresaleTokenValue] = useState<string>('0');
-  const [calculatedLaunchPrice, setCalculatedLaunchPrice] = useState<string>('0');
-  const [presaleTokenPrice, setPresaleTokenPrice] = useState<string>('0');
-  const [liquidityValue, setLiquidityValue] = useState<string>('0');
-  const [dexLiquidityTokens, setDexLiquidityTokens] = useState<string>('0');
-  const [dexLiquidityETH, setDexLiquidityETH] = useState<string>('0');
-  const [tokensFor100Presale, setTokensFor100Presale] = useState<string>('0'); // $100 worth of presale tokens
-  const [tokensFor100Launch, setTokensFor100Launch] = useState<string>('0'); // $100 worth of launch tokens
-  const [softCapReached, setSoftCapReached] = useState<boolean>(false);
-  const [fdv, setFdv] = useState<string>('0'); // Fully Diluted Valuation
-  const [marketCap, setMarketCap] = useState<string>('0'); // Market Cap
+const TokenDeploymentCalculator: React.FC = () => {
+  const [totalTokens, setTotalTokens] = useState<number>(Number(import.meta.env.VITE_TOTAL_TOKENS) || 0);
+  const [burnTokens, setBurnTokens] = useState<number>(Number(import.meta.env.VITE_BURN_TOKENS) || 0);
+  const [liquidityPoolTokens, setLiquidityPoolTokens] = useState<number>(Number(import.meta.env.VITE_LP_TOKENS) || 0);
+  const [presaleTokens, setPresaleTokens] = useState<number>(Number(import.meta.env.VITE_PRESALE_TOKENS) || 0);
+  const [devMarketingTokens, setDevMarketingTokens] = useState<number>(Number(import.meta.env.VITE_DEV_MARKETING_TOKENS) || 0);
+  const [liquidityInUSD, setLiquidityInUSD] = useState<number>(Number(import.meta.env.VITE_LIQUIDITY_IN_USD) || 0);
+  const [presaleValueRaised, setPresaleValueRaised] = useState<number>(Number(import.meta.env.VITE_PRESALE_VALUE_RAISED) || 0); // Presale raised value
+  const [softCap, setSoftCap] = useState<number>(Number(import.meta.env.VITE_SOFT_CAP) || 0); // Soft cap input
+
+  const [unreleasedTokens, setUnreleasedTokens] = useState<number>(0);
+  const [actualLaunchPrice, setActualLaunchPrice] = useState<number>(0); // Final launch price
+  const [minLaunchPrice, setMinLaunchPrice] = useState<number>(0); // Minimum launch price
+  const [marketCap, setMarketCap] = useState<number>(0); // Market cap calculation
+  const [totalLiquidityValue, setTotalLiquidityValue] = useState<number>(0); // Liquidity calculation
 
   const isMobile = useBreakpointValue({ base: true, lg: false });
 
   useEffect(() => {
-    calculateValues();
-  }, [totalTokens, percentReleased, ethProvided, presalePercentage, presaleEarnings, liquidityPercent, minSoftCap]);
+    const totalForLaunch = liquidityPoolTokens + presaleTokens;
 
-  // Function to calculate token prices, liquidity value, DEX settings, FDV, and Market Cap
-  const calculateValues = () => {
-    try {
-      // Calculate presale token value based on percentage
-      const presaleTokens = Math.floor(parseFloat(totalTokens) * (presalePercentage / 100));
-      setPresaleTokenValue(presaleTokens.toLocaleString('en-US', { maximumFractionDigits: 0 })); // No decimals for large numbers
+    // Calculate unreleased tokens
+    const unreleased = totalTokens - burnTokens - liquidityPoolTokens - presaleTokens - devMarketingTokens;
+    setUnreleasedTokens(unreleased);
 
-      // Presale price calculation based on presale earnings and tokens
-      const presalePricePerToken = parseFloat(presaleEarnings) / presaleTokens;
-
-      // Launch price calculation (owner’s value added to presale earnings)
-      const totalTokensReleased = Math.floor(parseFloat(totalTokens) * (percentReleased / 100));
-      const totalValueForLaunch = parseFloat(ethProvided) + parseFloat(presaleEarnings);
-      const launchPricePerToken = totalValueForLaunch / totalTokensReleased;
-
-      // Liquidity value calculation (both presale earnings and owner's ETH, doubled for DEX liquidity)
-      const totalLiquidityValue = 2 * (totalValueForLaunch * (liquidityPercent / 100));
-      const singleLiquidityValue = totalValueForLaunch * (liquidityPercent / 100);
-      const liquidityTokens = Math.floor(singleLiquidityValue / launchPricePerToken); // No decimals for liquidity tokens
-      const dexEth = Math.floor(singleLiquidityValue); // No decimals for ETH value
-
-      // Fully Diluted Valuation (FDV) calculation (doubled)
-      const fdvValue = Math.floor(2 * (parseFloat(totalTokens) * launchPricePerToken));
-      setFdv(fdvValue.toLocaleString('en-US', { maximumFractionDigits: 0 }));
-
-      // Market Cap calculation (doubled)
-      const marketCapValue = Math.floor(2 * (totalTokensReleased * launchPricePerToken));
-      setMarketCap(marketCapValue.toLocaleString('en-US', { maximumFractionDigits: 0 }));
-
-      // Check if soft cap is reached
-      setSoftCapReached(parseFloat(presaleEarnings) >= parseFloat(minSoftCap));
-
-      // Calculate tokens for $100 based on presale and launch prices
-      const tokensFor100Presale = Math.floor(100 / presalePricePerToken);
-      const tokensFor100Launch = Math.floor(100 / launchPricePerToken);
-
-      // Update calculated values
-      setPresaleTokenPrice(presalePricePerToken.toLocaleString('en-US', { minimumFractionDigits: 18, maximumFractionDigits: 18 }));
-      setCalculatedLaunchPrice(launchPricePerToken.toLocaleString('en-US', { minimumFractionDigits: 18, maximumFractionDigits: 18 }));
-      setLiquidityValue(totalLiquidityValue.toLocaleString('en-US', { maximumFractionDigits: 0 }));
-
-      // Set DEX liquidity values (single values)
-      setDexLiquidityTokens(liquidityTokens.toLocaleString('en-US', { maximumFractionDigits: 0 }));
-      setDexLiquidityETH(dexEth.toLocaleString('en-US', { maximumFractionDigits: 0 }));
-
-      // Set $100 worth of tokens
-      setTokensFor100Presale(tokensFor100Presale.toLocaleString('en-US', { maximumFractionDigits: 0 }));
-      setTokensFor100Launch(tokensFor100Launch.toLocaleString('en-US', { maximumFractionDigits: 0 }));
-    } catch (error) {
-      console.error('Error in calculations:', error);
+    // Calculate the minimum launch price based on soft cap + initial liquidity
+    const totalInitialLiquidity = liquidityInUSD + softCap;
+    if (totalInitialLiquidity > 0 && liquidityPoolTokens > 0) {
+      const minPrice = totalInitialLiquidity / liquidityPoolTokens;
+      setMinLaunchPrice(minPrice);
     }
+
+    // Calculate actual launch price: Minimum Launch Price + (Presale Raised - Soft Cap) / Presale Tokens
+    if (presaleValueRaised > softCap && presaleTokens > 0) {
+      const presaleOverSoftCap = presaleValueRaised - softCap;
+      const finalLaunchPrice = minLaunchPrice + (presaleOverSoftCap / presaleTokens);
+      setActualLaunchPrice(finalLaunchPrice);
+    } else {
+      // If presale raised is less than soft cap, use min launch price for final launch price
+      setActualLaunchPrice(minLaunchPrice);
+    }
+
+    // Calculate total liquidity value (doubled based on final launch price)
+    const totalLiquidity = actualLaunchPrice * (liquidityPoolTokens + presaleTokens) * 2;
+    setTotalLiquidityValue(totalLiquidity);
+
+    // Calculate market cap (doubled based on final launch price and total tokens)
+    const calculatedMarketCap = actualLaunchPrice * totalTokens * 2;
+    setMarketCap(calculatedMarketCap);
+  }, [
+    totalTokens, burnTokens, liquidityPoolTokens, presaleTokens, devMarketingTokens,
+    liquidityInUSD, presaleValueRaised, softCap, actualLaunchPrice
+  ]);
+
+  const pieData = {
+    labels: [
+      'Burn',
+      'Liquidity Pool (LP)',
+      'Presale Offering',
+      'Dev/Marketing',
+      'Unreleased',
+    ],
+    datasets: [
+      {
+        data: [burnTokens, liquidityPoolTokens, presaleTokens, devMarketingTokens, unreleasedTokens],
+        backgroundColor: ['#FF6384', '#0052FF', '#00C2FF', '#0091FF', '#8f8f8f'],
+        hoverOffset: 4,
+      },
+    ],
   };
 
-  // Conditional style for affected values if soft cap is not reached
-  const affectedTextColor = softCapReached ? 'inherit' : 'red.500';
+  const pieOptions = {
+  plugins: {
+    legend: {
+      display: false, // This will hide the legend labels
+    },
+    tooltip: {
+      callbacks: {
+        label: function (tooltipItem) {
+          const dataIndex = tooltipItem.dataIndex;
+          const label = pieData.labels[dataIndex];
+          const value = pieData.datasets[0].data[dataIndex];
+          const percentage = ((value / totalTokens) * 100).toFixed(2);
+          return `${label}: ${value.toLocaleString()} tokens (${percentage}%)`;
+        },
+      },
+    },
+    datalabels: {
+      display: false, // Keep this as per your preference
+      formatter: (value: number) => {
+        const percentage = ((value / totalTokens) * 100).toFixed(2);
+        return `${value.toLocaleString()} \n(${percentage}%)`;
+      },
+      color: '#fff',
+      font: {
+        size: 12,
+      },
+      anchor: 'end',
+      align: 'start',
+      offset: 10,
+    },
+  },
+  maintainAspectRatio: false,
+  responsive: true,
+};
+
 
   return (
     <Flex
@@ -94,184 +120,253 @@ const CalculatorPage: React.FC = () => {
       p={6}
       borderRadius="xl"
       boxShadow="xl"
-      bg="rgba(0, 0, 0, 0.7)"
+      bgImage="/images/b3.png"
+      bgPosition="center"
+      bgRepeat="no-repeat"
+      bgSize="cover"
       color="white"
       width="100%"
     >
+
       {/* Left Column - Inputs */}
       <VStack spacing={4} width={isMobile ? '100%' : '50%'}>
+        <Box width="100%">
+          <Text mt={4} mb={2} fontSize="2xl">Deployment Figures</Text>
+        </Box>
+
         <Box width="100%">
           <Text mb={2} fontSize="lg">Total Token Supply</Text>
           <Input
             bg="white"
             color="black"
             value={totalTokens}
-            onChange={(e) => setTotalTokens(e.target.value)}
-            placeholder="Enter total supply"
+            onChange={(e) => setTotalTokens(Number(e.target.value))}
+          />
+        </Box>
+
+
+        <HStack width="100%" >
+          <Box width="100%">
+            <Input
+              bg="white"
+              color="black"
+              value={liquidityPoolTokens}
+              onChange={(e) => setLiquidityPoolTokens(Number(e.target.value))}
+            />
+            <Text mb={2} fontSize="lg">Projects Initial Token Qty</Text>
+
+          </Box>
+
+          <Box width="100%">
+            <Input
+              bg="white"
+              color="black"
+              value={liquidityInUSD}
+              onChange={(e) => setLiquidityInUSD(Number(e.target.value))}
+            />
+              <Text mb={2} fontSize="lg">Projects Initial Value USD</Text>
+          </Box>
+        </HStack>
+
+        <Divider my={2} borderColor="gray.500" />
+
+
+        <Box width="100%">
+          <Text mb={2} fontSize="lg">Tokens to Burn </Text>
+          <Input
+            bg="white"
+            color="black"
+            value={burnTokens}
+            onChange={(e) => setBurnTokens(Number(e.target.value))}
           />
         </Box>
 
         <Box width="100%">
-          <Text mb={2} fontSize="lg">Percentage Released at Launch (%)</Text>
+          <Text mb={2} fontSize="lg">Dev/Marketing Tokens</Text>
           <Input
             bg="white"
             color="black"
-            type="number"
-            value={percentReleased}
-            onChange={(e) => setPercentReleased(parseFloat(e.target.value))}
-            placeholder="Enter percentage to release"
+            value={devMarketingTokens}
+            onChange={(e) => setDevMarketingTokens(Number(e.target.value))}
+          />
+        </Box>
+
+        <Divider my={2} borderColor="gray.500" />
+
+        <HStack width="100%" >
+
+        <Box width="100%">
+          <Text mb={2} fontSize="lg">Presale Token Qty</Text>
+          <Input
+            bg="white"
+            color="black"
+            value={presaleTokens}
+            onChange={(e) => setPresaleTokens(Number(e.target.value))}
           />
         </Box>
 
         <Box width="100%">
-          <Text mb={2} fontSize="lg">Owner Boost (in USD):</Text>
+          <Text mb={2} fontSize="lg">Min SoftCap (USD)</Text>
           <Input
             bg="white"
             color="black"
-            value={ethProvided}
-            onChange={(e) => setEthProvided(e.target.value)}
-            placeholder="Enter total ETH in USD"
+            value={softCap}
+            onChange={(e) => setSoftCap(Number(e.target.value))}
+          />
+        </Box>
+        </HStack>
+
+
+    <Divider my={2} borderColor="gray.500" />
+
+
+
+    <HStack width="100%">
+        <Box width="100%">
+          <Text mt={4} mb={2} fontSize="lg">Presale Value Raised</Text>
+          <Input
+            bg="white"
+            color="black"
+            value={presaleValueRaised}
+            onChange={(e) => setPresaleValueRaised(Number(e.target.value))}
           />
         </Box>
 
-        <Box width="100%">
-          <Text mb={2} fontSize="lg">Tokens to Presale based off total supply (%)</Text>
-          <Input
-            bg="white"
-            color="black"
-            type="number"
-            value={presalePercentage}
-            onChange={(e) => setPresalePercentage(parseFloat(e.target.value))}
-            placeholder="Enter percentage of tokens for presale"
-          />
-        </Box>
+      </HStack>
+        <Divider my={2} borderColor="gray.500" />
 
-        <Box width="100%">
-          <Text mb={2} fontSize="lg">Minimum Soft Cap (in USD)</Text>
-          <Input
-            bg="white"
-            color="black"
-            value={minSoftCap}
-            onChange={(e) => setMinSoftCap(e.target.value)}
-            placeholder="Enter minimum soft cap"
-          />
-        </Box>
-
-        <Box width="100%">
-          <Text mb={2} fontSize="lg">Actual Presale Earnings</Text>
-          <Input
-            bg="white"
-            color="black"
-            value={presaleEarnings}
-            onChange={(e) => setPresaleEarnings(e.target.value)}
-            placeholder="Enter presale earnings"
-          />
-        </Box>
       </VStack>
 
-      {/* Right Column - Results (Invoice-style) */}
+      {/* Right Column - Results */}
       <VStack spacing={6} width={isMobile ? '100%' : '50%'} mt={isMobile ? 6 : 0} pl={isMobile ? 0 : 6}>
-        <Divider my={4} borderColor="gray.500" />
 
-        <Box width="100%" bg="gray.800" p={4} borderRadius="md" boxShadow="md">
-          <Text fontSize="lg" fontWeight="bold" mb={4} >Summary</Text>
-
-          <HStack justifyContent="space-between">
-            <Text>Total Token Supply:</Text>
-            <Text>{parseFloat(totalTokens).toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text>Percentage Released on deploy:</Text>
-            <Text>{percentReleased}%</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text>Owner Boost (in USD):</Text>
-            <Text>${parseFloat(ethProvided).toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text> Tokens to Deploy:</Text>
-            <Text>{dexLiquidityTokens}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text>Presale Allocation:</Text>
-            <Text>{presaleTokenValue}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text>Minimum Soft Cap:</Text>
-            <Text>${parseFloat(minSoftCap).toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={6}>
-            <Text>Presale Earnings (in USD):</Text>
-            <Text>${parseFloat(presaleEarnings).toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
-          </HStack>
-
-          {/* Soft Cap Status */}
-          {!softCapReached && (
-            <Box color="red.500" mt={4}>
-              <Text>Softcap not reached! These values may not be accurate:</Text>
-            </Box>
-          )}
-
-          <Divider my={4} borderColor="gray.500" />
-          <Text fontSize="lg" fontWeight="bold" mb={3}>Exchange Deployment Figures</Text>
-
-          <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color={affectedTextColor}>Tokens to Deploy:</Text>
-            <Text fontWeight="bold" color={affectedTextColor}>{dexLiquidityTokens}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text fontWeight="bold" color={affectedTextColor}>ETH Value to Deploy:</Text>
-            <Text fontWeight="bold" color={affectedTextColor}>${dexLiquidityETH}</Text>
-          </HStack>
-
-          <Divider my={4} borderColor="gray.500" />
-          <Text fontSize="lg" fontWeight="bold" mb={3}>Expected Tokens per $100USD</Text>
-
-          <HStack justifyContent="space-between" mt={4}>
-            <Text fontWeight="bold" color="green.400">$100 in Presale:</Text>
-            <Text fontWeight="bold" color="green.400">{tokensFor100Presale}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text fontWeight="bold" color="green.400">$100 at Launch:</Text>
-            <Text fontWeight="bold" color="green.400">{tokensFor100Launch}</Text>
-          </HStack>
-
-          <Divider my={4} borderColor="gray.500" />
-
-          {/* LP and Market Cap */}
-          <Text fontSize="lg" fontWeight="bold" mb={3}>Estimated Launch Figures</Text>
-
-          <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color={affectedTextColor}>Presale Token Price:</Text>
-            <Text fontWeight="bold" color={affectedTextColor}>${presaleTokenPrice}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text fontWeight="bold" color={affectedTextColor}>Launch Price:</Text>
-            <Text fontWeight="bold" color={affectedTextColor}>${calculatedLaunchPrice}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={2}>
-            <Text fontWeight="bold" color="yellow.400">Liquidity (LP):</Text>
-            <Text fontWeight="bold" color="yellow.400">${liquidityValue}</Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" mt={4}>
-            <Text fontWeight="bold" color="yellow.400">Market Cap (MC):</Text>
-            <Text fontWeight="bold" color="yellow.400">${fdv}</Text>
-          </HStack>
+        {/* Pie Chart */}
+        <Box width="100%" bg="rgba(0, 0, 0, 0.7)" p={9} borderRadius="md" boxShadow="md">
+        <Text fontSize="lg" fontWeight="bold" mb={4}>Deployment Chart</Text>
+          <Box  height="200px">
+            <Doughnut data={pieData} options={pieOptions} />
+          </Box>
         </Box>
+
+        {/* New Section - Deployment Figures and Percentages */}
+  <Box width="100%" bg="rgba(0, 0, 0, 0.7)" p={4} borderRadius="md" boxShadow="md">
+    <Text fontSize="lg" fontWeight="bold" mb={4}>Deployment Figures and Percentages</Text>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <HStack>
+        <Box
+          width="15px"
+          height="15px"
+          bg="#FF6384"
+          border="2px solid white"
+          borderRadius="2px"
+        />
+        <Text>To Burn:</Text>
+      </HStack>
+      <Text>{burnTokens.toLocaleString()} ({((burnTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+    </HStack>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <HStack>
+        <Box
+          width="15px"
+          height="15px"
+          bg="#0052FF"
+          border="2px solid white"
+          borderRadius="2px"
+        />
+        <Text>Initial Token Qty:</Text>
+      </HStack>
+      <Text>{liquidityPoolTokens.toLocaleString()} ({((liquidityPoolTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+    </HStack>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <HStack>
+        <Box
+          width="15px"
+          height="15px"
+          bg="#00C2FF"
+          border="2px solid white"
+          borderRadius="2px"
+        />
+        <Text>Presale:</Text>
+      </HStack>
+      <Text>{presaleTokens.toLocaleString()} ({((presaleTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+    </HStack>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <HStack>
+        <Box
+          width="15px"
+          height="15px"
+          bg="#0091FF"
+          border="2px solid white"
+          borderRadius="2px"
+        />
+        <Text>Dev/Marketing:</Text>
+      </HStack>
+      <Text>{devMarketingTokens.toLocaleString()} ({((devMarketingTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+    </HStack>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <HStack>
+        <Box
+          width="15px"
+          height="15px"
+          bg="#8f8f8f"
+          border="2px solid white"
+          borderRadius="2px"
+        />
+        <Text>Unreleased:</Text>
+      </HStack>
+      <Text>{unreleasedTokens.toLocaleString()} ({((unreleasedTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+    </HStack>
+    <HStack justifyContent="space-between" mt={2}>
+  <HStack>
+    <Box
+      width="15px"
+      height="15px"
+      bg="#65fa64"
+      border="2px solid white"
+      borderRadius="2px"
+    />
+    <Text>To be Released:</Text>
+  </HStack>
+  <Text>{(totalTokens - unreleasedTokens).toLocaleString()} ({(((totalTokens - unreleasedTokens) / totalTokens) * 100).toFixed(2)}%)</Text>
+</HStack>
+  </Box>
+  <Box width="100%" bg="rgba(0, 0, 0, 0.7)" p={4} borderRadius="md" boxShadow="md">
+    <Text fontSize="lg" fontWeight="bold" mb={4}>Summary</Text>
+
+    <HStack justifyContent="space-between">
+      <Text>Total Token Supply:</Text>
+      <Text>{totalTokens.toLocaleString()}</Text>
+    </HStack>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <Text>Minimum Launch Price:</Text>
+      <Text>${minLaunchPrice.toFixed(9)}</Text>
+    </HStack>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <Text>Actual Launch Price:</Text>
+      <Text>${actualLaunchPrice.toFixed(9)}</Text>
+    </HStack>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <Text>Total Liquidity Value (LP):</Text>
+      <Text>${totalLiquidityValue.toLocaleString()}</Text>
+    </HStack>
+
+    <HStack justifyContent="space-between" mt={2}>
+      <Text>Market Cap:</Text>
+      <Text>${marketCap.toLocaleString()}</Text>
+    </HStack>
+  </Box>
+
+
       </VStack>
     </Flex>
   );
 };
-
-export default CalculatorPage;
+export default TokenDeploymentCalculator;
