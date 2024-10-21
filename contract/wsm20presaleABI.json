@@ -1,19 +1,16 @@
 [
 	{
+		"inputs": [],
+		"name": "cancelPresale",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
 				"name": "_presaleTokenAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_USDTAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_chainlinkPricefeedEth",
 				"type": "address"
 			},
 			{
@@ -24,11 +21,6 @@
 			{
 				"internalType": "uint256",
 				"name": "_softCapUSD",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_totalTokens",
 				"type": "uint256"
 			},
 			{
@@ -89,33 +81,45 @@
 	},
 	{
 		"anonymous": false,
-		"inputs": [],
-		"name": "PresaleCancelled",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
 		"inputs": [
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "newPresalePercentage",
+				"name": "newInitialTokenQty",
 				"type": "uint256"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "newTokensToRelease",
+				"name": "newInitialValueToAddInUSD",
 				"type": "uint256"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "newOwnerBoostedContribution",
+				"name": "newBurnTokens",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newDevMarketingTokens",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newHardCapUSD",
 				"type": "uint256"
 			}
 		],
-		"name": "PresaleParametersUpdated",
+		"name": "ParametersUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [],
+		"name": "PresaleCancelled",
 		"type": "event"
 	},
 	{
@@ -148,6 +152,19 @@
 			}
 		],
 		"name": "PresaleSuccessful",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newPresaleValueRaised",
+				"type": "uint256"
+			}
+		],
+		"name": "PresaleValueRaisedUpdated",
 		"type": "event"
 	},
 	{
@@ -222,24 +239,73 @@
 		"type": "event"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
 				"internalType": "uint256",
-				"name": "newPresalePercentage",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "newTokensToRelease",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "newOwnerBoostedContribution",
+				"name": "newTotalTokensOfferedPresale",
 				"type": "uint256"
 			}
 		],
-		"name": "updatePresaleParameters",
+		"name": "TotalTokensOfferedPresaleUpdated",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "newInitialTokenQty",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newInitialValueToAddInUSD",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newBurnTokens",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newDevMarketingTokens",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newHardCapUSD",
+				"type": "uint256"
+			}
+		],
+		"name": "updateParameters",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "newPresaleValueRaised",
+				"type": "uint256"
+			}
+		],
+		"name": "updatePresaleValueRaised",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "newTotalTokensOfferedPresale",
+				"type": "uint256"
+			}
+		],
+		"name": "updateTotalTokensOfferedPresale",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -260,12 +326,44 @@
 	},
 	{
 		"inputs": [],
+		"name": "burnTokens",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "chainlinkPricefeedEth",
 		"outputs": [
 			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "claimed",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -302,6 +400,19 @@
 			{
 				"internalType": "uint256",
 				"name": "totalContributionUSD",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "devMarketingTokens",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
 				"type": "uint256"
 			}
 		],
@@ -363,7 +474,7 @@
 						"type": "uint256"
 					}
 				],
-				"internalType": "struct Presale.Contributor[]",
+				"internalType": "struct WSM20Presale.Contributor[]",
 				"name": "",
 				"type": "tuple[]"
 			}
@@ -387,6 +498,45 @@
 	{
 		"inputs": [],
 		"name": "getPresaleTokenBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "hardCapUSD",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "initialTokenQty",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "initialValueToAddInUSD",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -424,19 +574,6 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "ownerBoostedContribution",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -483,19 +620,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "presalePercentage",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "presaleSuccessful",
 		"outputs": [
 			{
@@ -522,12 +646,31 @@
 	},
 	{
 		"inputs": [],
-		"name": "presaleTokenBalance",
+		"name": "presaleValueRaised",
 		"outputs": [
 			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "refunded",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -536,32 +679,6 @@
 	{
 		"inputs": [],
 		"name": "softCapUSD",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "tokensToRelease",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalContributionsUSD",
 		"outputs": [
 			{
 				"internalType": "uint256",

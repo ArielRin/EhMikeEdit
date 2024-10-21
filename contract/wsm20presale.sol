@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 
-
 /*
 Example Parameters:
 so you know what to type out, Mike:
@@ -8,11 +7,16 @@ so you know what to type out, Mike:
     presaleTokenAddress:        0xA716C25e30Af41472bd51C92A643861d4Fa28021
     totalTokensOfferedPresale:  1000000000000000000000000 (1,000,000 tokens with 18 decimals)
     softCapUSD:                 2000000000 (2,000 USD with 6 decimals)
-    totalTokens                 123000000000000000000000000000 total supply of the presale token with 18 zeros for 18 decimal token
     presaleEndDate              1731641075  e.g this the date 15 november 2024 . see here to get value https://www.epochconverter.com/ unix time value as entry
 */
 
+
+
+
+
 pragma solidity 0.8.19;
+
+
 
 import "@openzeppelin/contracts@4.5.0/token/ERC20/IERC20.sol";
 
@@ -32,16 +36,20 @@ interface Aggregator {
 contract WSM20BabyDogePresale {
     address public owner;
     address public presaleTokenAddress;
-    address public USDTAddress = 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2;
-    address public chainlinkPricefeedEth = 0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70 ;
+    address public USDTAddress;
+    address public chainlinkPricefeedEth;
+
+    uint256 public totalTokens;
+    uint256 public initialTokenQty;
+    uint256 public initialValueToAddInUSD;
+    uint256 public burnTokens;
+    uint256 public devMarketingTokens;
     uint256 public totalTokensOfferedPresale;
     uint256 public softCapUSD;
-    uint256 public totalContributionsUSD;
-    uint256 public totalTokens; // Total supply of presale token
-    uint256 public tokensToRelease = 100; // Default: 100% tokens released after presale
-    uint256 public ownerBoostedContribution = 0; // Default: 0 USD boost
-    uint256 public presalePercentage = 80; // Default: 80% for presale
-    uint256 public presaleEndDate; // UNIX timestamp for presale end date
+    uint256 public presaleValueRaised;
+    uint256 public hardCapUSD;
+    uint256 public presaleEndDate;
+
     bool public presaleSuccessful;
     bool public claimEnabled;
     bool public presaleCancelled;
@@ -54,38 +62,29 @@ contract WSM20BabyDogePresale {
 
     mapping(address => uint256) public ethContributions;
     mapping(address => uint256) public usdtContributions;
+    mapping(address => bool) public claimed;
+    mapping(address => bool) public refunded;
     Contributor[] public contributors;
     mapping(address => bool) public isContributor;
 
+    // Events for updates
     event TokensPurchased(address indexed buyer, uint256 amountContributed);
     event TokensClaimed(address indexed claimer, uint256 amountClaimed);
-    event PresaleSuccessful(uint256 totalContributionsUSD, uint256 totalTokensOfferedPresaleDistributed);
     event RefundIssued(address indexed user, uint256 amountRefunded);
+    event PresaleSuccessful(uint256 totalContributionsUSD, uint256 totalTokensOfferedPresaleDistributed);
     event ClaimEnabled();
     event PresaleCancelled();
     event PresalePaused(bool paused);
-    event PresaleParametersUpdated(uint256 newPresalePercentage, uint256 newTokensToRelease, uint256 newOwnerBoostedContribution);
-
-    constructor(
-        address _presaleTokenAddress,
-        uint256 _totalTokensOfferedPresale,
-        uint256 _softCapUSD,
-        uint256 _totalTokens,
-        uint256 _presaleEndDate
-    ) {
-        owner = msg.sender;
-        presaleTokenAddress = _presaleTokenAddress;
-        USDTAddress = USDTAddress;
-        chainlinkPricefeedEth = chainlinkPricefeedEth;
-        totalTokensOfferedPresale = _totalTokensOfferedPresale;
-        softCapUSD = _softCapUSD;
-        totalTokens = _totalTokens;
-        presaleEndDate = _presaleEndDate;
-        presaleSuccessful = false;
-        claimEnabled = false;
-        presaleCancelled = false;
-        presalePaused = false;
-    }
+    event InitialTokenQtyUpdated(uint256 newInitialTokenQty);
+    event InitialValueToAddInUSDUpdated(uint256 newInitialValueToAddInUSD);
+    event BurnTokensUpdated(uint256 newBurnTokens);
+    event DevMarketingTokensUpdated(uint256 newDevMarketingTokens);
+    event TotalTokensOfferedPresaleUpdated(uint256 newTotalTokensOfferedPresale);
+    event PresaleValueRaisedUpdated(uint256 newPresaleValueRaised);
+    event HardCapUpdated(uint256 newHardCapUSD);
+    event TokensToReleaseUpdated(uint256 newTokensToRelease);
+    event OwnerBoostedContributionUpdated(uint256 newOwnerBoostedContribution);
+    event PresalePercentageUpdated(uint256 newPresalePercentage);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Caller is not owner");
@@ -107,47 +106,72 @@ contract WSM20BabyDogePresale {
         _;
     }
 
-    // Get the latest ETH price using Chainlink
-    function getLatestETHPrice() public view returns (uint256) {
-        (, int256 price, , ,) = Aggregator(chainlinkPricefeedEth).latestRoundData();
-        return uint256(price * 10 ** 10); // Convert price to have 18 decimals (ETH/USD typically returns 8 decimals)
+    constructor(
+        address _presaleTokenAddress,
+        uint256 _totalTokensOfferedPresale,
+        uint256 _softCapUSD,
+        uint256 _presaleEndDate
+    ) {
+        owner = msg.sender;
+        presaleTokenAddress = _presaleTokenAddress;
+        USDTAddress = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+        chainlinkPricefeedEth = 0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70 ;
+        totalTokens = 0;
+        initialTokenQty = 0;
+        initialValueToAddInUSD = 0;
+        burnTokens = 0;
+        devMarketingTokens = 0;
+        totalTokensOfferedPresale = _totalTokensOfferedPresale;
+        softCapUSD = _softCapUSD;
+        presaleEndDate = _presaleEndDate;
+        presaleSuccessful = false;
+        claimEnabled = false;
+        presaleCancelled = false;
+        presalePaused = false;
     }
 
-    // Convert ETH to USD based on the Chainlink price
-    function ethToUSD(uint256 ethAmount) public view returns (uint256) {
-        uint256 ethPriceInUSD = getLatestETHPrice();
-        uint256 ethInUSD = (ethAmount * ethPriceInUSD) / 1 ether; // Adjust ETH to its correct decimal place
-        return ethInUSD / 1e12; // Adjust to 6 decimal places for USD
+    // Update functions
+    function updateInitialTokenQty(uint256 newInitialTokenQty) external onlyOwner {
+        initialTokenQty = newInitialTokenQty;
+        emit InitialTokenQtyUpdated(newInitialTokenQty);
     }
 
-    // Convert USDT to USD (1:1 ratio)
-    function usdtToUSD(uint256 usdtAmount) public pure returns (uint256) {
-        return usdtAmount;
+    function updateInitialValueToAddInUSD(uint256 newInitialValueToAddInUSD) external onlyOwner {
+        initialValueToAddInUSD = newInitialValueToAddInUSD;
+        emit InitialValueToAddInUSDUpdated(newInitialValueToAddInUSD);
     }
 
-    // Update the presale parameters, such as percentage and tokens released
-    function updatePresaleParameters(
-        uint256 newPresalePercentage,
-        uint256 newTokensToRelease,
-        uint256 newOwnerBoostedContribution
-    ) external onlyOwner {
-        require(newPresalePercentage <= 100, "Presale percentage cannot exceed 100%");
-        require(newTokensToRelease <= 100, "Tokens to release cannot exceed 100%");
-
-        presalePercentage = newPresalePercentage;
-        tokensToRelease = newTokensToRelease;
-        ownerBoostedContribution = newOwnerBoostedContribution;
-
-        emit PresaleParametersUpdated(newPresalePercentage, newTokensToRelease, newOwnerBoostedContribution);
+    function updateBurnTokens(uint256 newBurnTokens) external onlyOwner {
+        burnTokens = newBurnTokens;
+        emit BurnTokensUpdated(newBurnTokens);
     }
 
-    // Contribute to the presale using ETH
+    function updateDevMarketingTokens(uint256 newDevMarketingTokens) external onlyOwner {
+        devMarketingTokens = newDevMarketingTokens;
+        emit DevMarketingTokensUpdated(newDevMarketingTokens);
+    }
+
+    function updateTotalTokensOfferedPresale(uint256 newTotalTokensOfferedPresale) external onlyOwner {
+        totalTokensOfferedPresale = newTotalTokensOfferedPresale;
+        emit TotalTokensOfferedPresaleUpdated(newTotalTokensOfferedPresale);
+    }
+
+    function updatePresaleValueRaised(uint256 newPresaleValueRaised) external onlyOwner {
+        presaleValueRaised = newPresaleValueRaised;
+        emit PresaleValueRaisedUpdated(newPresaleValueRaised);
+    }
+
+    function updateHardCapUSD(uint256 newHardCapUSD) external onlyOwner {
+        hardCapUSD = newHardCapUSD;
+        emit HardCapUpdated(newHardCapUSD);
+    }
+
+    // Contribute with ETH
     function contributeWithETH() external payable presaleNotCancelled presaleNotPaused presaleNotEnded {
         require(msg.value > 0, "Must contribute ETH");
-
         uint256 contributionInUSD = ethToUSD(msg.value);
         ethContributions[msg.sender] += msg.value;
-        totalContributionsUSD += contributionInUSD;
+        presaleValueRaised += contributionInUSD;
 
         if (!isContributor[msg.sender]) {
             contributors.push(Contributor(msg.sender, contributionInUSD));
@@ -164,16 +188,14 @@ contract WSM20BabyDogePresale {
         emit TokensPurchased(msg.sender, contributionInUSD);
     }
 
-    // Contribute to the presale using USDT
+    // Contribute with USDT
     function contributeWithUSDT(uint256 usdtAmount) external presaleNotCancelled presaleNotPaused presaleNotEnded {
         require(usdtAmount > 0, "Must contribute USDT");
-
         uint256 allowance = IERC20(USDTAddress).allowance(msg.sender, address(this));
         require(allowance >= usdtAmount, "USDT allowance too low");
-
         IERC20(USDTAddress).transferFrom(msg.sender, address(this), usdtAmount);
         usdtContributions[msg.sender] += usdtAmount;
-        totalContributionsUSD += usdtToUSD(usdtAmount);
+        presaleValueRaised += usdtToUSD(usdtAmount);
 
         if (!isContributor[msg.sender]) {
             contributors.push(Contributor(msg.sender, usdtAmount));
@@ -190,56 +212,65 @@ contract WSM20BabyDogePresale {
         emit TokensPurchased(msg.sender, usdtAmount);
     }
 
-    // End the presale if soft cap is reached
-    function endPresale() external onlyOwner presaleNotCancelled {
-        require(totalContributionsUSD >= softCapUSD, "Soft cap in USD not reached");
-        presaleSuccessful = true;
-        emit PresaleSuccessful(totalContributionsUSD, totalTokensOfferedPresale);
+    // Get the latest ETH price using Chainlink
+    function getLatestETHPrice() public view returns (uint256) {
+        (, int256 price, , ,) = Aggregator(chainlinkPricefeedEth).latestRoundData();
+        return uint256(price * 10 ** 10); // Convert to 18 decimals
     }
 
-    // Enable claims after the presale is successful
+    // Convert ETH to USD based on the Chainlink price
+    function ethToUSD(uint256 ethAmount) public view returns (uint256) {
+        uint256 ethPriceInUSD = getLatestETHPrice();
+        return (ethAmount * ethPriceInUSD) / 1 ether / 1e12; // Convert to 6 decimals
+    }
+
+    // Convert USDT to USD (1:1 ratio)
+    function usdtToUSD(uint256 usdtAmount) public pure returns (uint256) {
+        return usdtAmount;
+    }
+
+    // End the presale if the soft cap is reached
+    function endPresale() external onlyOwner presaleNotCancelled {
+        require(presaleValueRaised >= softCapUSD, "Soft cap not reached");
+        presaleSuccessful = true;
+        emit PresaleSuccessful(presaleValueRaised, totalTokensOfferedPresale);
+    }
+
+    // Enable token claiming
     function enableClaimTokens() external onlyOwner {
         require(presaleSuccessful, "Presale must be successful to enable claims");
-        require(!presaleCancelled, "Cannot enable claims, presale was cancelled");
         claimEnabled = true;
         emit ClaimEnabled();
     }
 
+    // Claim tokens after the presale
     function claimTokens() external {
         require(presaleSuccessful, "Presale not successful");
-        require(claimEnabled, "Token claim is not enabled");
-        require(!presaleCancelled, "Presale was cancelled, no tokens to claim");
+        require(claimEnabled, "Claiming not enabled");
+        require(!claimed[msg.sender], "Tokens already claimed");
 
-        uint256 userTotalContributionUSD = ethToUSD(ethContributions[msg.sender]) + usdtContributions[msg.sender];
-        require(userTotalContributionUSD > 0, "No contributions from user");
+        uint256 userContributionUSD = ethToUSD(ethContributions[msg.sender]) + usdtContributions[msg.sender];
+        require(userContributionUSD > 0, "No contributions from user");
 
-        uint256 userSharePercentage = (userTotalContributionUSD * 1e6) / totalContributionsUSD;
-        uint256 userTokenAmount = (totalTokensOfferedPresale * userSharePercentage) / 1e6;
-
+        uint256 userTokenAmount = (totalTokensOfferedPresale * userContributionUSD) / presaleValueRaised;
         require(userTokenAmount > 0, "No tokens to claim");
 
+        claimed[msg.sender] = true;
         IERC20(presaleTokenAddress).transfer(msg.sender, userTokenAmount);
-
-        ethContributions[msg.sender] = 0;
-        usdtContributions[msg.sender] = 0;
 
         emit TokensClaimed(msg.sender, userTokenAmount);
     }
 
-
-    function cancelPresale() external onlyOwner {
-        require(!presaleSuccessful, "Cannot cancel a successful presale");
-        presaleCancelled = true;
-        emit PresaleCancelled();
-    }
-
+    // Issue refunds if the presale is cancelled or fails
     function refund() external {
-        require(presaleCancelled || totalContributionsUSD < softCapUSD, "No refunds, presale successful");
+        require(presaleCancelled || presaleValueRaised < softCapUSD, "Refunds not allowed");
+        require(!refunded[msg.sender], "Already refunded");
 
         uint256 ethContribution = ethContributions[msg.sender];
         if (ethContribution > 0) {
             ethContributions[msg.sender] = 0;
             payable(msg.sender).transfer(ethContribution);
+            refunded[msg.sender] = true;
             emit RefundIssued(msg.sender, ethContribution);
         }
 
@@ -247,45 +278,53 @@ contract WSM20BabyDogePresale {
         if (usdtContribution > 0) {
             usdtContributions[msg.sender] = 0;
             IERC20(USDTAddress).transfer(msg.sender, usdtContribution);
+            refunded[msg.sender] = true;
             emit RefundIssued(msg.sender, usdtContribution);
         }
     }
 
-    function withdrawRemainingTokens() external onlyOwner {
-        require(presaleSuccessful, "Presale not successful");
-        require(!presaleCancelled, "Presale was cancelled, no withdrawal");
-        uint256 remainingTokens = IERC20(presaleTokenAddress).balanceOf(address(this));
-        IERC20(presaleTokenAddress).transfer(owner, remainingTokens);
+    // Cancel the presale
+    function cancelPresale() external onlyOwner {
+        require(!presaleSuccessful, "Cannot cancel a successful presale");
+        presaleCancelled = true;
+        emit PresaleCancelled();
     }
 
-    function withdrawContributions() external onlyOwner {
-        require(presaleSuccessful, "Presale not successful");
-        require(!presaleCancelled, "Presale was cancelled, no withdrawal");
-
-        payable(owner).transfer(address(this).balance);
-
-        uint256 usdtBalance = IERC20(USDTAddress).balanceOf(address(this));
-        IERC20(USDTAddress).transfer(owner, usdtBalance);
-    }
-
-    // Pause and resume the presale
+    // Toggle presale pause state
     function togglePresalePause() external onlyOwner {
         presalePaused = !presalePaused;
         emit PresalePaused(presalePaused);
     }
 
-    // Get the balance of the presale token held in the contract
-    function presaleTokenBalance() public view returns (uint256) {
+    // Withdraw remaining tokens after the presale
+    function withdrawRemainingTokens() external onlyOwner {
+        require(presaleSuccessful, "Presale not successful");
+        uint256 remainingTokens = IERC20(presaleTokenAddress).balanceOf(address(this));
+        IERC20(presaleTokenAddress).transfer(owner, remainingTokens);
+    }
+
+    // Withdraw contributions (ETH and USDT)
+    function withdrawContributions() external onlyOwner {
+        require(presaleSuccessful, "Presale not successful");
+
+        uint256 contractETHBalance = address(this).balance;
+        if (contractETHBalance > 0) {
+            payable(owner).transfer(contractETHBalance);
+        }
+
+        uint256 contractUSDTBalance = IERC20(USDTAddress).balanceOf(address(this));
+        if (contractUSDTBalance > 0) {
+            IERC20(USDTAddress).transfer(owner, contractUSDTBalance);
+        }
+    }
+
+    // Get the balance of presale tokens
+    function getPresaleTokenBalance() public view returns (uint256) {
         return IERC20(presaleTokenAddress).balanceOf(address(this));
     }
 
     // Get the list of contributors
     function getContributors() external view returns (Contributor[] memory) {
         return contributors;
-    }
-
-    // Get the total presale tokens held in the contract
-    function getPresaleTokenBalance() external view returns (uint256) {
-        return IERC20(presaleTokenAddress).balanceOf(address(this));
     }
 }

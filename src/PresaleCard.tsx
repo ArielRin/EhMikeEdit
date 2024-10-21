@@ -1,46 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Box, Flex, Text, Image, SimpleGrid, useToast
-} from '@chakra-ui/react';
+// PresaleCard.tsx
+import React, { useEffect, useState } from 'react';
+import { Box, Text, Flex, useToast } from '@chakra-ui/react';
 import { ethers, Contract } from 'ethers';
 import presaleAbi from './Abi/presaleAbi.json';
 
-// Sample list of presale contract addresses
-const PRESALE_CONTRACT_ADDRESSES = [
-  '0x1234567890abcdef1234567890abcdef12345678',
-  '0xabcdef1234567890abcdef1234567890abcdef12',
-  // Add more addresses here
-];
+interface PresaleCardProps {
+  presaleAddress: string;
+}
 
-const RPC_URL = import.meta.env.VITE_RPC_URL as string;
-
-const PresaleCardPage: React.FC = () => {
-  const [presaleContracts, setPresaleContracts] = useState<string[]>(PRESALE_CONTRACT_ADDRESSES);
-
-  return (
-    <Box p={6}>
-      <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb={6}>
-        Active Presales
-      </Text>
-      <SimpleGrid columns={[1, null, 2, 4]} spacing={6}>
-        {presaleContracts.map((address, index) => (
-          <PresaleCard key={index} presaleAddress={address} />
-        ))}
-      </SimpleGrid>
-    </Box>
-  );
-};
-
-export default PresaleCardPage;
-
-// Card Component derived from your original PresaleComponent
-const PresaleCard: React.FC<{ presaleAddress: string }> = ({ presaleAddress }) => {
+const PresaleCard: React.FC<PresaleCardProps> = ({ presaleAddress }) => {
   const [totalTokensOffered, setTotalTokensOffered] = useState<string>('0');
   const [isPresaleCancelled, setIsPresaleCancelled] = useState<boolean>(false);
   const [isPresaleSuccessful, setIsPresaleSuccessful] = useState<boolean>(false);
   const toast = useToast();
 
-  // Fetch Presale Details (extracted from your original component)
+  const RPC_URL = import.meta.env.VITE_RPC_URL as string;
+
+  // Fetch Presale Details
   const fetchPresaleDetails = async () => {
     try {
       const provider = new ethers.JsonRpcProvider(RPC_URL);
@@ -100,3 +76,5 @@ const PresaleCard: React.FC<{ presaleAddress: string }> = ({ presaleAddress }) =
     </Box>
   );
 };
+
+export default PresaleCard;

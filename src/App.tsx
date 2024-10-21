@@ -43,6 +43,21 @@ const chains = [
     explorerUrl: 'https://basescan.org',
     rpcUrl: 'https://mainnet.base.org'
   },
+    {
+      chainId: 7171,
+      name: 'BitRock',
+      currency: 'BROCK',
+      explorerUrl: 'https://explorer.bit-rock.io',
+      rpcUrl: 'https://connect.bit-rock.io'
+    },
+
+      {
+        chainId: 7771,
+        name: 'TestBock',
+        currency: 'tBROCK',
+        explorerUrl: 'https://testnetscan.bit-rock.io',
+        rpcUrl: 'https://testnet.bit-rock.io'
+      },
 
   // added testnets for dev recreation of joeys frontend works
     { chainId: 84532, name: 'Base Sepolia', currency: 'ETH', explorerUrl: 'https://sepolia.basescan.org', rpcUrl: 'https://sepolia.base.org' }
@@ -79,7 +94,7 @@ const modal = createWeb3Modal({
   },
   chainImages: {
       8453: '/images/base.png',
-
+      7171: '/images/brock.png',
       84532: '/images/baset.png',
     },
   tokens: {
