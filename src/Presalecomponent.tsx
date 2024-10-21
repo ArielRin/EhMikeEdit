@@ -4,6 +4,9 @@ import {
   TabPanels, Tab, TabPanel, useToast
 } from '@chakra-ui/react';
 import { ethers, Contract, JsonRpcSigner, JsonRpcProvider, BigNumberish } from 'ethers';
+
+import { usePrice } from './PriceContext'; // Adjust the import path as needed
+
 import { useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react';
 import presaleAbi from './Abi/presaleAbi.json';
 
@@ -36,6 +39,7 @@ const PresaleComponent: React.FC = () => {
   const [presaleTokenBalance, setPresaleTokenBalance] = useState<string>('0');
   const [isContributingETH, setIsContributingETH] = useState<boolean>(false);
   const [isContributingUSDT, setIsContributingUSDT] = useState<boolean>(false);
+  const { setMinLaunchPrice, setActualLaunchPrice } = usePrice();
 
   const toast = useToast();
   const { isConnected, address } = useWeb3ModalAccount();

@@ -269,55 +269,10 @@ const handleContractAction = async (
 
   return (
     <Box position="relative" flex={1} p={0} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
-      <Flex flexDirection="column" p={6} borderRadius="xl" boxShadow="xl" color="white" width="100%" maxW="800px" mx="auto">
-        <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg" mb={10}>
-          <Image mb={8} src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" />
-          <Box mb={8} textAlign="center" mx="auto">
-            <w3m-button />
-          </Box>
-          <Text fontSize="lg" fontWeight="bold" mb={4}>
-            Presale Overview
-          </Text>
-          <Flex justifyContent="space-between" mb={2}>
-            <Text>Current ETH Price:</Text>
-            <Text>${ethPrice}</Text>
-          </Flex>
-          <Flex justifyContent="space-between" mb={2}>
-            <Text>Total Contributions:</Text>
-            <Text>${parseFloat(totalContributionsUSD).toLocaleString()}</Text>
-          </Flex>
-          <Flex justifyContent="space-between" mb={2}>
-            <Text>Soft Cap:</Text>
-            <Text>${softCapUSD}</Text>
-          </Flex>
-          <Flex justifyContent="space-between" mb={2}>
-            <Text>Total Tokens Offered:</Text>
-            <Text>{totalTokensOffered} Tokens</Text>
-          </Flex>
-          <Progress value={(parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100} colorScheme="green" borderRadius="md" width="100%" />
-          <Flex justifyContent="space-between" mb={2}>
-            <Text>Presale Successful:</Text>
-            <Text>{isPresaleSuccessful ? "Yes" : "No"}</Text>
-          </Flex>
-          <Flex justifyContent="space-between" mb={2}>
-            <Text>Claim Enabled:</Text>
-            <Text>{isClaimEnabled ? "Yes" : "No"}</Text>
-          </Flex>
-          <Flex justifyContent="space-between" mb={2}>
-            <Text>Presale Cancelled:</Text>
-            <Text>{isPresaleCancelled ? "Yes" : "No"}</Text>
-          </Flex>
-          <Flex fontSize="sm" justifyContent="space-between" mb={2}>
-            <Text>Token Address:</Text>
-            <Text>{PRESALE_TOKEN_ADDRESS}</Text>
-          </Flex>
-          <Flex fontSize="sm" justifyContent="space-between" mb={2}>
-            <Text>Presale Contract:</Text>
-            <Text>{PRESALE_CONTRACT_ADDRESS}</Text>
-          </Flex>
-        </Box>
+      <Flex flexDirection="column" borderRadius="xl"  boxShadow="xl" color="white" width="100%" maxW="800px" mx="auto">
 
-        <Box p={4} bg="rgba(0, 0, 0, 0.7)" borderRadius="md" boxShadow="lg" mb={10}>
+
+        <Box p={4} bg="rgba(0, 0, 0, 0.7)"  boxShadow="lg" mb={10}>
           <Tabs isFitted variant="enclosed">
             <TabList>
               <Tab>Admin Controls</Tab>

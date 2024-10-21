@@ -70,29 +70,121 @@ const NewPage = () => {
               </Text>
             </Flex>
 
-            <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
-              <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff" bg="rgba(0, 0, 0, 0.61)" bgImage="/images/b2.png" bgSize="cover" bgPosition="left">
-                <RouterLink to="/introBABY">
-                  <Image src="/images/babytextlogo.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
-                  <Image src="/images/nobase.png" alt="header" mx="auto" width="20%" minW="180px" mb={2} />
-                  <Flex justifyContent="center" flexWrap="wrap">
-                    <Text mt="10px" width="60%" textAlign="center" fontSize="lg" fontWeight="normal">
-                      Click to Enter Site
-                    </Text>
-                  </Flex>
-                  <Flex justifyContent="center" flexWrap="wrap">
-                    <Text width="60%" textAlign="center" fontSize="lg" fontWeight="normal">
-                      BABYDOGE on Base Presale Coming soon...
-                    </Text>
-                  </Flex>
-                  <Image src={currentImageBabyDoge} alt="BabyDoge" mx="auto" width="40%" minW="250px" mt="28px" borderRadius="2xl" />
+            <Flex  p={0} flexWrap="wrap" >
+
+
+            <Box
+              flex={1}
+              minW="300px"
+              m={2}
+              p={7}
+              borderRadius="2xl"
+              boxShadow="md"
+              textAlign="center"
+              border="2px"
+              borderColor="#fff"
+              bg="rgba(0, 0, 0, 0.61)"
+              bgImage="/images/b2.png"
+              bgSize="cover"
+              bgPosition="left"
+            >
+              <Image src="/images/babytextlogo.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
+              <Image src="/images/nobase.png" alt="header" mx="auto" width="20%" minW="180px" mb={2} />
+
+              <Flex justifyContent="center" gap={4} mt={6}>
+                <RouterLink to="/admin">
+                  <Box
+                    p={4}
+                    bg="rgba(128, 128, 128, 0.5)"
+                    borderRadius="md"
+                    _hover={{ bg: "rgba(128, 128, 128, 0.7)" }}
+                    textAlign="center"
+                    color="white"
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    width="150px"
+                  >
+                    <Image src="/images/settings.svg" alt="Settings" width="24px" mb={2} />
+                    <Text>Settings</Text>
+                  </Box>
                 </RouterLink>
-              </Box>
+
+                <RouterLink to="/stake">
+                  <Box
+                    p={4}
+                    bg="rgba(128, 128, 128, 0.5)"
+                    borderRadius="md"
+                    _hover={{ bg: "rgba(128, 128, 128, 0.7)" }}
+                    textAlign="center"
+                    color="white"
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    width="150px"
+                  >
+                    <Image src="/images/dig.svg" alt="NFT Staking" width="24px" mb={2} />
+                    <Text>NFT Staking</Text>
+                  </Box>
+                </RouterLink>
+
+                <RouterLink to="/nftstats">
+                  <Box
+                    p={4}
+                    bg="rgba(128, 128, 128, 0.5)"
+                    borderRadius="md"
+                    _hover={{ bg: "rgba(128, 128, 128, 0.7)" }}
+                    textAlign="center"
+                    color="white"
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    width="150px"
+                  >
+                    <Image src="/images/pie-chart.svg" alt="NFT Stats" width="24px" mb={2} />
+                    <Text>NFT Stats</Text>
+                  </Box>
+                </RouterLink>
+              </Flex>
+
+              <RouterLink to="/introBABY">
+                <Box
+                  mt={6}
+                  p={4}
+                  bg="rgba(128, 128, 128, 0.5)"
+                  borderRadius="md"
+                  _hover={{ bg: "rgba(128, 128, 128, 0.7)" }}
+                  textAlign="center"
+                  color="white"
+                >
+                  <Text fontSize="lg" fontWeight="normal" mb={2}>
+                    Click to Enter Site
+                  </Text>
+                  <Text fontSize="lg" fontWeight="normal">
+                    BABYDOGE on Base Presale Coming soon...
+                  </Text>
+                  <Image
+                    src={currentImageBabyDoge}
+                    alt="BabyDoge"
+                    mx="auto"
+                    width="40%"
+                    minW="250px"
+                    mt="28px"
+                    borderRadius="2xl"
+                  />
+                </Box>
+              </RouterLink>
+            </Box>
+
 
               <Box m={2} maxW="480px" flex={1} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff">
                 <Presalecomponent />
               </Box>
             </Flex>
+
+
+
+
             <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
               <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" bg="rgba(0, 0, 0, 0.61)" border="2px" borderColor="#fff">
                 <RouterLink to="/">

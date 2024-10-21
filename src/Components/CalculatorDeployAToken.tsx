@@ -1,3 +1,4 @@
+// this file at ./Components/CalculatorDeployAToken.tsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,

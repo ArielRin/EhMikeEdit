@@ -158,9 +158,9 @@ const modal = createWeb3Modal({
         <Route path="/" element={<Intro />} />
           <Route path="/introbaby" element={<IntroBABY />} />
           <Route path="/presale" element={<Presalecomponent />} />
-          <Route path="/admin" element={<PresaleAdminPage />} />
           <Route path="/list" element={<ContributorList />} />
           <Route path="/calc" element={<CalculatorDeployAToken />} />
+          <Route path="/admin" element={<CalculatorDeployAToken />} />
           <Route path="/details" element={<TokenDetails />} />
           <Route path="/deploy" element={<DeployPoolPage />} />
           <Route path="/admindeploy" element={<AdminDeployPoolPage />} />
