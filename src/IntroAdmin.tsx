@@ -6,6 +6,7 @@ import Footer from './Components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitter as faXTwitter, faTelegram } from '@fortawesome/free-brands-svg-icons';
 import Presalecomponent from './Presalecomponent';
+import AdminStyled from './Components/DeploymentModal';
 import './1styles.css'; // Make sure this points to your CSS file
 
 const imagePaths = ['/images/logobwb.png'];
@@ -122,7 +123,7 @@ const NewPage = () => {
                                     cursor="pointer"
                                   >
                                   <Image src="/images/admin-panel.svg" alt="Claim Icon" boxSize="60px"  mb={2} />
-                                    <Text>Token Details</Text>
+                                  <Text>Token Details</Text>
                                   </Box>
                                 </RouterLink>
 
@@ -182,8 +183,8 @@ const NewPage = () => {
               </Box>
             </Box>
 
-              <Box m={2} maxW="480px" flex={1} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff">
-                <Presalecomponent />
+              <Box m={2} maxW="480px" bg="rgba(0, 0, 0, 0.65)" flex={1} borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff">
+                <AdminStyled />
               </Box>
             </Flex>
 

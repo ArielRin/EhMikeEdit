@@ -27,7 +27,7 @@ const RPC_URL = import.meta.env.VITE_RPC_URL as string;
 
 // Base chain block time (1.9 seconds per block)
 const BLOCK_TIME_SECONDS = 1.9;
-const REWARD_TOKEN_DECIMALS = 9; // Set reward token decimals to 9 for RYIU
+const REWARD_TOKEN_DECIMALS = 9; // Set reward token decimals to 9 for BBDOGE
 
 const NftStakingPage = () => {
   const [currentBlock, setCurrentBlock] = useState<number>(0);
@@ -389,17 +389,17 @@ try {
 
 
     return (
-      <Box bgImage="/images/foxyBkg.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
+      <Box bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
         <Box maxW="1000px" mx="auto">
           <Flex p={6} bg="rgba(0, 0, 0, 0.65)" justify="space-between" align="center">
-            <Heading>Foxy NFT Staking Stats</Heading>
-            <Flex align="right">
-              <w3m-button />
-            </Flex>
+          <Heading>BabyDoge on Base NFT Staking Stats</Heading>
+          <Flex align="right">
+            <w3m-button />
           </Flex>
-          <Heading p={2} bg="rgba(0, 0, 0, 0.65)" size="md">
-            Stake Foxy NFT - Earn $RYIU
-          </Heading>
+        </Flex>
+        <Heading p={2} bg="rgba(0, 0, 0, 0.65)" size="md">
+          Stake BabyDoge on Base NFT - Earn BabyDoge
+        </Heading>
 
           {/* Staking Stats */}
           <Box mt={6} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
@@ -465,7 +465,7 @@ try {
               {/* Reward Token Price */}
               <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  $RYIU Token Price
+                  $BBDOGE Token Price
                 </Text>
                 <Text fontSize="4xl" fontWeight="bold" color="white">
                   ${rewardTokenPrice.toFixed(8)}

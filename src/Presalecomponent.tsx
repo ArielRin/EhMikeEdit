@@ -1,11 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box, Flex, Text, Button, Progress, Input, Image, InputGroup, InputLeftElement, Tabs, TabList,
-  TabPanels, Tab, TabPanel, useToast
+  TabPanels, Tab, TabPanel, useToast,
+
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
 } from '@chakra-ui/react';
 import { ethers, Contract, JsonRpcSigner, JsonRpcProvider, BigNumberish } from 'ethers';
-
-import { usePrice } from './PriceContext'; // Adjust the import path as needed
+import TokenDeploymentCalculator from './Components/DeploymentModal';
 
 import { useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react';
 import presaleAbi from './Abi/presaleAbi.json';
@@ -39,7 +46,11 @@ const PresaleComponent: React.FC = () => {
   const [presaleTokenBalance, setPresaleTokenBalance] = useState<string>('0');
   const [isContributingETH, setIsContributingETH] = useState<boolean>(false);
   const [isContributingUSDT, setIsContributingUSDT] = useState<boolean>(false);
-  const { setMinLaunchPrice, setActualLaunchPrice } = usePrice();
+  // Inside your PresaleComponent:
+  const [isCalculatorModalOpen, setCalculatorModalOpen] = useState(false);
+
+  const openCalculatorModal = () => setCalculatorModalOpen(true);
+  const closeCalculatorModal = () => setCalculatorModalOpen(false);
 
   const toast = useToast();
   const { isConnected, address } = useWeb3ModalAccount();
@@ -332,6 +343,8 @@ try {
     ? (parseFloat(totalContributionsUSD) / parseFloat(softCapUSD)) * 100
     : 0;
 
+
+
     return (
       <Flex
         flexDirection="column"
@@ -355,6 +368,20 @@ try {
               <Text fontSize="4xl" mt={2}>
                 {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
               </Text>
+              <Button
+              mt={4}
+              mb={4}
+              width="50%"
+              size="md"
+              borderRadius="3xl"
+              bg="#2182ff"
+              color="white"
+              onClick={openCalculatorModal}
+              leftIcon={<Image src="/images/claimbd.png" alt="Claim Icon" boxSize="24px" />}
+              mx="auto"
+              >
+              Token Details
+              </Button>
               <Progress value={softCapPercentage} size="lg" mx="auto" maxW="250px" colorScheme="blue" borderRadius="md" mt={4} />
               <Text fontSize="md" textAlign="center" mt={2}>
                 Contributions ${parseFloat(totalContributionsUSD).toFixed(2)} / ${parseFloat(softCapUSD).toFixed(2)} USD
@@ -377,6 +404,7 @@ try {
             </Box>
           )}
         </Box>
+
 
         {/* Conditionally hide the Tabs section when presale is cancelled or successful */}
         {!isPresaleCancelled && !isPresaleSuccessful && (
@@ -513,7 +541,7 @@ try {
 
               {/* Position Panel */}
               <TabPanel>
-                <Box width="100%" mt={5} mb={12} borderRadius="md" boxShadow="lg">
+                <Box width="100%" mb={7} borderRadius="md" boxShadow="lg">
                   <Text fontSize="lg" fontWeight="bold" mb={4} textAlign="center">
                     Your Contributions
                   </Text>
@@ -532,6 +560,15 @@ try {
                   <Flex justifyContent="space-between">
                     <Text>Your Purchase Percentage:</Text>
                     <Text>{contributionPercentage.toFixed(2)}%</Text>
+                  </Flex>
+
+
+
+                  <Flex justifyContent="space-between">
+
+                    <Text>
+
+                    </Text>
                   </Flex>
                 </Box>
                 <Button
@@ -577,6 +614,8 @@ try {
                 <Text>Your Purchase Percentage:</Text>
                 <Text>{contributionPercentage.toFixed(2)}%</Text>
               </Flex>
+
+
             </Box>
             <Button
               mt={5}
@@ -630,6 +669,27 @@ try {
             </Button>
           </Flex>
         )}
+        <Modal isOpen={isCalculatorModalOpen} onClose={closeCalculatorModal} size="xl">
+    <ModalOverlay />
+    <ModalContent
+      sx={{
+        bg: 'transparent',
+        boxShadow: 'none',
+        border: 'none',
+        backdropFilter: 'blur(10px)', // Optional: For a blurred background effect
+      }}
+    >
+      <ModalHeader p={0}>
+        <ModalCloseButton color="white" />
+      </ModalHeader>
+      <ModalBody p={0}>
+        {/* Include the Calculator Component Here */}
+        <TokenDeploymentCalculator />
+      </ModalBody>
+    </ModalContent>
+  </Modal>
+
+
       </Flex>
     );
 }

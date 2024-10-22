@@ -277,6 +277,16 @@
 				"internalType": "uint256",
 				"name": "newHardCapUSD",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newSoftCapUSD",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "newTotalTokensOfferedPresale",
+				"type": "uint256"
 			}
 		],
 		"name": "updateParameters",

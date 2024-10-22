@@ -373,16 +373,16 @@ setPendingReward(formattedPendingReward);
 
 
     return (
-      <Box bgImage="/images/foxyBkg.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
+      <Box bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
         <Box maxW="1000px" mx="auto">
           <Flex p={6} bg="rgba(0, 0, 0, 0.65)" justify="space-between" align="center">
-            <Heading>Foxy NFT Staking Stats</Heading>
+            <Heading>BabyDoge on Base NFT Staking Stats</Heading>
             <Flex align="right">
               <w3m-button />
             </Flex>
           </Flex>
           <Heading p={2} bg="rgba(0, 0, 0, 0.65)" size="md">
-            Stake Foxy NFT - Earn $RYIU
+            Stake BabyDoge on Base NFT - Earn BabyDoge
           </Heading>
 
           {/* Staking Stats */}

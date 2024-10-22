@@ -1,0 +1,33 @@
+import React from 'react';
+import { Box, Flex } from '@chakra-ui/react';
+import PresaleComponent from './PresaleComponent';
+
+const CenteredPresalePage: React.FC = () => {
+  return (
+
+    <Box position="relative" flex={1} p={0} m={0} display="flex" flexDirection="column" color="white">
+        <Box flex={1} p={4} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
+
+    <Flex
+      minHeight="100vh"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Box
+        maxW="480px"
+        width="100%"
+        borderRadius="2xl"
+        boxShadow="lg"
+        border="2px"
+        borderColor="#fff"
+      >
+        <PresaleComponent />
+      </Box>
+
+    </Flex>
+      </Box>
+      </Box>
+  );
+};
+
+export default CenteredPresalePage;

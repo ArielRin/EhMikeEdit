@@ -266,46 +266,19 @@ const TokenDeploymentCalculator: React.FC = () => {
     return (
       <Flex
         flexDirection="column"
-        p={2}
-        borderRadius="xl"
-        boxShadow="xl"
-        bgImage="/images/b3.png"
         bgPosition="center"
         bgRepeat="no-repeat"
         bgSize="cover"
         color="white"
         width="100%"
         >
-        <ul className="circles">
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
-      
-      <Tabs  isFitted variant="soft-rounded" width="100%" color="white" maxW="450px" mt={6}>
-        <TabList>
-        <Tab color="white" _selected={{ color: 'white', bg: '#2182ff' }}>
-          Deployment</Tab>
-          <Tab color="white" _selected={{ color: 'white', bg: '#2182ff' }}>
-          Presale</Tab>
-          <Tab color="white" _selected={{ color: 'white', bg: '#2182ff' }}>
-          Admin</Tab>
-          <Tab color="white" _selected={{ color: 'white', bg: '#2182ff' }}>
-          Edit</Tab>
-        </TabList>
-        <TabPanels>
 
-            <TabPanel>
-              <Box  width="100%" bg="rgba(0, 0, 0, 0.7)" p={4} borderRadius="xl" boxShadow="md">
+
+              <Box  width="100%" bg="rgba(0, 0, 0, 0.3)" p={4}
+              borderRadius="3xl"  boxShadow="md">
               <Image mb={6} src="images/logobwb.png" alt="header" mx="auto" width="70%" minW="250px" mt="28px" />
-                <Box height="200px">
+
+                <Box mt={4} height="200px">
                   <Doughnut data={pieData} options={pieOptions} />
                 </Box>
 
@@ -360,134 +333,13 @@ const TokenDeploymentCalculator: React.FC = () => {
                   </HStack>
                   <HStack justifyContent="space-between" mt={2}>
                     <Text>Minimum Launch Price:</Text>
-  <FormattedPrice price={minLaunchPrice} />
+                    <FormattedPrice price={minLaunchPrice} />
                     </HStack>
                   <HStack justifyContent="space-between" mt={2}>
-                    <Text>Actual Launch Price:</Text>
-                      <FormattedPrice price={actualLaunchPrice} />
-                  </HStack>
-                  <HStack justifyContent="space-between" mt={2}>
-                    <Text>Total Liquidity Value (LP):</Text>
-                    <Text>${totalLiquidityValue.toLocaleString()}</Text>
-                  </HStack>
-                  <HStack justifyContent="space-between" mt={2}>
-                    <Text>Market Cap:</Text>
-                    <Text>${marketCap.toLocaleString()}</Text>
-                  </HStack>
-                  <HStack justifyContent="space-between" mt={2}>
                     <Text>Soft Cap Reached:</Text>
-                    <Text>${softCap.toLocaleString()} / ${contributionsUSD.toLocaleString()}</Text>
+                    <Text mb={4}>${softCap.toLocaleString()} / ${contributionsUSD.toLocaleString()}</Text>
                   </HStack>
                 </Box>
-            </TabPanel>
-            <TabPanel>
-              <Box width="100%" borderRadius="xl" boxShadow="md" >
-                <Presalecomponent />
-              </Box>
-            </TabPanel>
-            <TabPanel>
-              <Box width="100%" borderRadius="xl" boxShadow="md" >
-                <Admin />
-              </Box>
-            </TabPanel>
-            <TabPanel>
-            <VStack spacing={4} width="100%">
-              <Box width="100%">
-                <Text mt={4} mb={2} fontSize="2xl">Deployment Figures</Text>
-              </Box>
-
-              <Box width="100%">
-                <Text mb={2} fontSize="lg">Total Token Supply</Text>
-                <Input bg="white" color="black" value={totalTokens} isReadOnly />
-              </Box>
-
-              <HStack width="100%">
-                <Box width="100%">
-                  <Text mb={2} fontSize="lg">Projects Initial Token Qty</Text>
-                  <Input
-                    bg="white"
-                    color="black"
-                    value={liquidityPoolTokens}
-                    onChange={handleChange(setLiquidityPoolTokens)}
-                  />
-                </Box>
-
-                <Box width="100%">
-                  <Text mb={2} fontSize="lg">Projects Initial Value USD</Text>
-                  <Input
-                    bg="white"
-                    color="black"
-                    value={liquidityInUSD}
-                    onChange={handleChange(setLiquidityInUSD)}
-                  />
-                </Box>
-              </HStack>
-
-              <Box width="100%">
-                <Text mb={2} fontSize="lg">Tokens to Burn</Text>
-                <Input
-                  bg="white"
-                  color="black"
-                  value={burnTokens}
-                  onChange={handleChange(setBurnTokens)}
-                />
-              </Box>
-
-              <Box width="100%">
-                <Text mb={2} fontSize="lg">Dev/Marketing Tokens</Text>
-                <Input
-                  bg="white"
-                  color="black"
-                  value={devMarketingTokens}
-                  onChange={handleChange(setDevMarketingTokens)}
-                />
-              </Box>
-
-              <Box width="100%">
-                <Text mb={2} fontSize="lg">Presale Token Qty</Text>
-                <Input
-                  bg="white"
-                  color="black"
-                  value={totalTokensOfferedPresale}
-                  onChange={handleChange(setTotalTokensOfferedPresale)}
-                />
-              </Box>
-
-              <Box width="100%">
-                <Text mb={2} fontSize="lg">Soft Cap (USD)</Text>
-                <Input
-                  bg="white"
-                  color="black"
-                  value={softCap}
-                  onChange={handleChange(setSoftCap)}
-                />
-              </Box>
-
-              <Box width="100%">
-                <Text mb={2} fontSize="lg">Contributions in USD</Text>
-                <Input bg="white" color="black" value={contributionsUSD} isReadOnly />
-              </Box>
-
-              <Box width="100%">
-                <Text mb={2} fontSize="lg">Hard Cap (USD)</Text>
-                <Input
-                  bg="white"
-                  color="black"
-                  value={hardCap}
-                  onChange={handleChange(setHardCap)}
-                />
-              </Box>
-
-              <Button colorScheme="blue" onClick={updateParameters}>
-                Update Parameters
-              </Button>
-              <Divider my={2} borderColor="gray.500" />
-            </VStack>
-
-
-                </TabPanel>
-          </TabPanels>
-        </Tabs>
       </Flex>
     );
   };

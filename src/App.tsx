@@ -6,16 +6,18 @@ import Intro from './Intro';
 import IntroBABY from './IntroBABY';
 import Presalecomponent from './Presalecomponent';
 import PresaleAdminPage from './PresaleAdminPage';
+import IntroAdmin from './IntroAdmin';
 import ContributorList from './Components/ContributorList';
 
 import CalculatorDeployAToken from './Components/CalculatorDeployAToken';
+import DeploymentModal from './Components/DeploymentModal';
 import TokenDetails from './Components/TokenDetails';
 import DeployPoolPage from './DeployPoolPage';
 import AdminDeployPoolPage from './AdminDeployPoolPage';
 import DeployPoolAPI from './DeployPoolAPI';
-import NftStakePage from './NftStakePage';
 import ThirdWebNftStakePage from './3rdWebNftStakePage';
 import NftStakeStats from './3wNftStakeStats';
+import NftStakeStats2 from './NftStakeStats';
 import Stakecalc from './Stakecalc';
 import AllPresales from './AllPresales';
 
@@ -160,16 +162,18 @@ const modal = createWeb3Modal({
           <Route path="/presale" element={<Presalecomponent />} />
           <Route path="/list" element={<ContributorList />} />
           <Route path="/calc" element={<CalculatorDeployAToken />} />
+          <Route path="/tokendetails" element={<DeploymentModal />} />
+          <Route path="/token" element={<IntroAdmin />} />
           <Route path="/admin" element={<CalculatorDeployAToken />} />
           <Route path="/details" element={<TokenDetails />} />
           <Route path="/deploy" element={<DeployPoolPage />} />
           <Route path="/admindeploy" element={<AdminDeployPoolPage />} />
           <Route path="/apipools" element={<DeployPoolAPI />} />
-          <Route path="/stake" element={<NftStakePage />} />
-          <Route path="/2stake" element={<ThirdWebNftStakePage />} />
+          <Route path="/stake" element={<ThirdWebNftStakePage />} />
           <Route path="/nftstats" element={<NftStakeStats />} />
           <Route path="/stakecalc" element={<Stakecalc />} />
           <Route path="/allpresales" element={<AllPresales />} />
+          <Route path="/introadmin" element={<IntroAdmin />} />
       </Routes>
     </Router>
   );

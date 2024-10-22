@@ -10,13 +10,7 @@ so you know what to type out, Mike:
     presaleEndDate              1731641075  e.g this the date 15 november 2024 . see here to get value https://www.epochconverter.com/ unix time value as entry
 */
 
-
-
-
-
 pragma solidity 0.8.19;
-
-
 
 import "@openzeppelin/contracts@4.5.0/token/ERC20/IERC20.sol";
 
@@ -33,7 +27,7 @@ interface Aggregator {
         );
 }
 
-contract WSM20BabyDogePresale {
+contract WSM20Presale {
     address public owner;
     address public presaleTokenAddress;
     address public USDTAddress;
@@ -75,16 +69,15 @@ contract WSM20BabyDogePresale {
     event ClaimEnabled();
     event PresaleCancelled();
     event PresalePaused(bool paused);
-    event InitialTokenQtyUpdated(uint256 newInitialTokenQty);
-    event InitialValueToAddInUSDUpdated(uint256 newInitialValueToAddInUSD);
-    event BurnTokensUpdated(uint256 newBurnTokens);
-    event DevMarketingTokensUpdated(uint256 newDevMarketingTokens);
+    event ParametersUpdated(
+        uint256 newInitialTokenQty,
+        uint256 newInitialValueToAddInUSD,
+        uint256 newBurnTokens,
+        uint256 newDevMarketingTokens,
+        uint256 newHardCapUSD
+    );
     event TotalTokensOfferedPresaleUpdated(uint256 newTotalTokensOfferedPresale);
     event PresaleValueRaisedUpdated(uint256 newPresaleValueRaised);
-    event HardCapUpdated(uint256 newHardCapUSD);
-    event TokensToReleaseUpdated(uint256 newTokensToRelease);
-    event OwnerBoostedContributionUpdated(uint256 newOwnerBoostedContribution);
-    event PresalePercentageUpdated(uint256 newPresalePercentage);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Caller is not owner");
@@ -115,7 +108,7 @@ contract WSM20BabyDogePresale {
         owner = msg.sender;
         presaleTokenAddress = _presaleTokenAddress;
         USDTAddress = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
-        chainlinkPricefeedEth = 0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70 ;
+        chainlinkPricefeedEth = 0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70;
         totalTokens = 0;
         initialTokenQty = 0;
         initialValueToAddInUSD = 0;
@@ -130,40 +123,49 @@ contract WSM20BabyDogePresale {
         presalePaused = false;
     }
 
-    // Update functions
-    function updateInitialTokenQty(uint256 newInitialTokenQty) external onlyOwner {
-        initialTokenQty = newInitialTokenQty;
-        emit InitialTokenQtyUpdated(newInitialTokenQty);
-    }
+    // Bulk update function for multiple parameters at once
+    // Bulk update function for multiple parameters at once, including softCapUSD and totalTokensOfferedPresale
+function updateParameters(
+    uint256 newInitialTokenQty,
+    uint256 newInitialValueToAddInUSD,
+    uint256 newBurnTokens,
+    uint256 newDevMarketingTokens,
+    uint256 newHardCapUSD,
+    uint256 newSoftCapUSD,
+    uint256 newTotalTokensOfferedPresale
+) external onlyOwner {
+    initialTokenQty = newInitialTokenQty;
+    initialValueToAddInUSD = newInitialValueToAddInUSD;
+    burnTokens = newBurnTokens;
+    devMarketingTokens = newDevMarketingTokens;
+    hardCapUSD = newHardCapUSD;
+    softCapUSD = newSoftCapUSD;
+    totalTokensOfferedPresale = newTotalTokensOfferedPresale;
 
-    function updateInitialValueToAddInUSD(uint256 newInitialValueToAddInUSD) external onlyOwner {
-        initialValueToAddInUSD = newInitialValueToAddInUSD;
-        emit InitialValueToAddInUSDUpdated(newInitialValueToAddInUSD);
-    }
+    emit ParametersUpdated(
+        newInitialTokenQty,
+        newInitialValueToAddInUSD,
+        newBurnTokens,
+        newDevMarketingTokens,
+        newHardCapUSD
+    );
 
-    function updateBurnTokens(uint256 newBurnTokens) external onlyOwner {
-        burnTokens = newBurnTokens;
-        emit BurnTokensUpdated(newBurnTokens);
-    }
+    // Emit events for the updated values of softCapUSD and totalTokensOfferedPresale
+    emit TotalTokensOfferedPresaleUpdated(newTotalTokensOfferedPresale);
+    emit PresaleValueRaisedUpdated(newSoftCapUSD);
+}
 
-    function updateDevMarketingTokens(uint256 newDevMarketingTokens) external onlyOwner {
-        devMarketingTokens = newDevMarketingTokens;
-        emit DevMarketingTokensUpdated(newDevMarketingTokens);
-    }
 
+    // Update total tokens offered for presale
     function updateTotalTokensOfferedPresale(uint256 newTotalTokensOfferedPresale) external onlyOwner {
         totalTokensOfferedPresale = newTotalTokensOfferedPresale;
         emit TotalTokensOfferedPresaleUpdated(newTotalTokensOfferedPresale);
     }
 
+    // Update presale value raised manually
     function updatePresaleValueRaised(uint256 newPresaleValueRaised) external onlyOwner {
         presaleValueRaised = newPresaleValueRaised;
         emit PresaleValueRaisedUpdated(newPresaleValueRaised);
-    }
-
-    function updateHardCapUSD(uint256 newHardCapUSD) external onlyOwner {
-        hardCapUSD = newHardCapUSD;
-        emit HardCapUpdated(newHardCapUSD);
     }
 
     // Contribute with ETH
@@ -177,7 +179,7 @@ contract WSM20BabyDogePresale {
             contributors.push(Contributor(msg.sender, contributionInUSD));
             isContributor[msg.sender] = true;
         } else {
-            for (uint i = 0; i < contributors.length; i++) {
+            for (uint256 i = 0; i < contributors.length; i++) {
                 if (contributors[i].contributorAddress == msg.sender) {
                     contributors[i].totalContributionUSD += contributionInUSD;
                     break;
@@ -201,7 +203,7 @@ contract WSM20BabyDogePresale {
             contributors.push(Contributor(msg.sender, usdtAmount));
             isContributor[msg.sender] = true;
         } else {
-            for (uint i = 0; i < contributors.length; i++) {
+            for (uint256 i = 0; i < contributors.length; i++) {
                 if (contributors[i].contributorAddress == msg.sender) {
                     contributors[i].totalContributionUSD += usdtAmount;
                     break;
@@ -210,23 +212,6 @@ contract WSM20BabyDogePresale {
         }
 
         emit TokensPurchased(msg.sender, usdtAmount);
-    }
-
-    // Get the latest ETH price using Chainlink
-    function getLatestETHPrice() public view returns (uint256) {
-        (, int256 price, , ,) = Aggregator(chainlinkPricefeedEth).latestRoundData();
-        return uint256(price * 10 ** 10); // Convert to 18 decimals
-    }
-
-    // Convert ETH to USD based on the Chainlink price
-    function ethToUSD(uint256 ethAmount) public view returns (uint256) {
-        uint256 ethPriceInUSD = getLatestETHPrice();
-        return (ethAmount * ethPriceInUSD) / 1 ether / 1e12; // Convert to 6 decimals
-    }
-
-    // Convert USDT to USD (1:1 ratio)
-    function usdtToUSD(uint256 usdtAmount) public pure returns (uint256) {
-        return usdtAmount;
     }
 
     // End the presale if the soft cap is reached
@@ -316,6 +301,23 @@ contract WSM20BabyDogePresale {
         if (contractUSDTBalance > 0) {
             IERC20(USDTAddress).transfer(owner, contractUSDTBalance);
         }
+    }
+
+    // Get the latest ETH price using Chainlink
+    function getLatestETHPrice() public view returns (uint256) {
+        (, int256 price, , ,) = Aggregator(chainlinkPricefeedEth).latestRoundData();
+        return uint256(price * 10 ** 10); // Convert to 18 decimals
+    }
+
+    // Convert ETH to USD based on the Chainlink price
+    function ethToUSD(uint256 ethAmount) public view returns (uint256) {
+        uint256 ethPriceInUSD = getLatestETHPrice();
+        return (ethAmount * ethPriceInUSD) / 1 ether / 1e12; // Convert to 6 decimals
+    }
+
+    // Convert USDT to USD (1:1 ratio)
+    function usdtToUSD(uint256 usdtAmount) public pure returns (uint256) {
+        return usdtAmount;
     }
 
     // Get the balance of presale tokens

@@ -2,20 +2,91 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- <link rel="icon" type="image/svg+xml" href="/public/images/logo.png" /> -->
-    <link rel="icon" href="logo.png"/>
+    <link rel="icon" href="logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BABYDOGE Presale Test</title>
 
-     <meta name="twitter:card" content="summary_large_image" />
-     <meta name="twitter:image" content="https://stirring-cannoli-acc06c.netlify.app/twitter3.png" />
-     <meta name="twitter:description" content="Welcome to BABYDOGE on Base! Grab your Presale tokens while they last!"  />
-     <meta name="description" content="Welcome to BABYDOGE on Base! Grab your Presale tokens while they last!" />
-</head>
-<body>
-  <div id="root"></div>
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://stirring-cannoli-acc06c.netlify.app/twitter3.png" />
+    <meta name="twitter:description" content="Welcome to BABYDOGE on Base! Grab your Presale tokens while they last!" />
+    <meta name="description" content="Welcome to BABYDOGE on Base! Grab your Presale tokens while they last!" />
 
+    <style>
+      /* Loading screen styling */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 2s ease-out; /* Smooth fade-out effect */
+      }
+
+      /* Heartbeat animation for the image */
+      @keyframes heartbeat {
+        0% { transform: scale(1); }
+        30% { transform: scale(1.1); }
+        50% { transform: scale(1); }
+        70% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+      }
+
+      /* Image styling and animation */
+      #loading-screen img {
+        width: 200px;
+        animation: heartbeat 2s infinite;
+      }
+
+      /* Stylish text */
+      #loading-text {
+        margin-top: 20px;
+        font-size: 1.5rem;
+        color: #FFD700; /* Golden yellow color */
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        text-align: center;
+        animation: pulseText 2s infinite;
+      }
+
+      /* Text pulsing effect */
+      @keyframes pulseText {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+
+      /* Fade-out class */
+      .fade-out {
+        opacity: 0; /* Set opacity to 0 for a smooth transition */
+        pointer-events: none; /* Ensure the loading screen doesn't block interactions */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-screen">
+      <img src="images/claimbd.png" alt="Loading..." />
+      <div id="loading-text">Loading BabyDoge on Base...</div>
+    </div>
+    <div id="root"></div>
+
+    <script type="module">
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.classList.add('fade-out'); // Add the fade-out class
+            setTimeout(() => {
+              loadingScreen.style.display = 'none'; // Hide the element after the fade-out
+            }, 1000); // Wait for the fade-out transition to complete (2 seconds)
+          }
+        }, 100); // Show the loading screen for 2 seconds before starting fade-out
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
-
-</body>
+  </body>
 </html>
