@@ -10,8 +10,6 @@ import Presalecomponent from './Presalecomponent';
 import AdminStyled from './Components/DeploymentModal';
 import Mint from './Components/NftMint0/NftMint0';
 
-
-
 import './1styles.css'; // Make sure this points to your CSS file
 
 const imagePaths = ['/images/logobwb.png'];
@@ -39,7 +37,7 @@ const NewPage = () => {
     <>
       <Box position="relative" flex={1} p={0} m={0} display="flex" flexDirection="column" color="white">
         <Box flex={1} p={0} m={0} bg="rgba(0, 0, 0, 0.65)" display="flex" flexDirection="column" color="white">
-          <Box flex={1} p={1} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
+          <Box flex={1} p={0} m={0} display="flex" flexDirection="column" bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white">
             <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
               {/* Left column displayed only on larger screens */}
               <Box
@@ -154,128 +152,115 @@ const NewPage = () => {
                 </Box>
               </Box>
 
-
-                            {/* Box above the right column - only visible on smaller screens */}
-                            <Box
-                              flex={1}
-                              p={2}
-                              bg="rgba(0, 0, 0, 0.85)"
-                              textAlign="center"
-                              color="white"
-                              display={{ base: 'block', md: 'none' }} // Visible only on smaller screens
-                              position="fixed"
-                              bottom={0} // Fixed at the bottom of the viewport
-                              left={0}
-                              right={0}
-                              zIndex={10} // Ensures it stays above other elements
-                            >
-                              <Flex
-                                justifyContent="space-between"
-                                p={1}
-                                gap={2}
-                                flexWrap="nowrap"
-                              >
-                                <RouterLink to="/" style={{ textDecoration: 'none', flex: '1' }}>
-                                  <Box
-                                    p={1}
-                                    bg="rgba(251, 164, 30, 0.8)"
-                                    borderRadius="md"
-                                    _hover={{ bg: "rgba(251, 164, 30, 1)" }}
-                                    textAlign="center"
-                                    color="white"
-                                    display="flex"
-                                    flexDirection="column"
-                                    alignItems="center"
-                                    width="100%"
-                                    cursor="pointer"
-                                  >
-                                    <Image src="/images/direct-marketing.svg" alt="Claim Icon" boxSize="20px" mb={1} />
-                                    <Text fontSize="x-small">Presale</Text>
-                                  </Box>
-                                </RouterLink>
-                                <RouterLink to="/token" style={{ textDecoration: 'none', flex: '1' }}>
-                                  <Box
-                                    p={1}
-                                    bg="rgba(251, 164, 30, 0.8)"
-                                    borderRadius="md"
-                                    _hover={{ bg: "rgba(251, 164, 30, 1)" }}
-                                    textAlign="center"
-                                    color="white"
-                                    display="flex"
-                                    flexDirection="column"
-                                    alignItems="center"
-                                    width="100%"
-                                    cursor="pointer"
-                                  >
-                                    <Image src="/images/admin-panel.svg" alt="Claim Icon" boxSize="20px" mb={1} />
-                                    <Text fontSize="x-small">Token</Text>
-                                  </Box>
-                                </RouterLink>
-                                <RouterLink to="/stake" style={{ textDecoration: 'none', flex: '1' }}>
-                                  <Box
-                                    p={1}
-                                    bg="rgba(251, 164, 30, 0.8)"
-                                    borderRadius="md"
-                                    _hover={{ bg: "rgba(251, 164, 30, 1)" }}
-                                    textAlign="center"
-                                    color="white"
-                                    display="flex"
-                                    flexDirection="column"
-                                    alignItems="center"
-                                    width="100%"
-                                    cursor="pointer"
-                                  >
-                                    <Image src="/images/doge.svg" alt="Claim Icon" boxSize="20px" mb={1} />
-                                    <Text fontSize="x-small">NFT Stake</Text>
-                                  </Box>
-                                </RouterLink>
-                                <RouterLink to="/intromint" style={{ textDecoration: 'none', flex: '1' }}>
-                                  <Box
-                                    p={1}
-                                    bg="rgba(251, 164, 30, 0.8)"
-                                    borderRadius="md"
-                                    _hover={{ bg: "rgba(251, 164, 30, 1)" }}
-                                    textAlign="center"
-                                    color="white"
-                                    display="flex"
-                                    flexDirection="column"
-                                    alignItems="center"
-                                    width="100%"
-                                    cursor="pointer"
-                                  >
-                                    <Image src="/images/mining.svg" alt="Claim Icon" boxSize="20px" mb={1} />
-                                    <Text fontSize="x-small">Mint</Text>
-                                  </Box>
-                                </RouterLink>
-                              </Flex>
-                            </Box>
-
-
-              {/* Right column - Always visible */}
+              {/* Box above the right column - only visible on smaller screens */}
               <Box
                 flex={1}
-                m={2}
-                maxW="480px"
-                bg="rgba(0, 0, 0, 0.75)"
-                borderRadius="2xl"
-                boxShadow="md"
+                p={0}
+                bg="rgba(0, 0, 0, 0.85)"
                 textAlign="center"
-                border="2px"
-                borderColor="#fff"
+                color="white"
+                display={{ base: 'block', md: 'none' }} // Visible only on smaller screens
+                position="fixed"
+                bottom={0} // Fixed at the bottom of the viewport
+                left={0}
+                right={0}
+                zIndex={10} // Ensures it stays above other elements
+              >
+                <Flex
+                  justifyContent="space-between"
+                  p={1}
+                  gap={1}
+                  flexWrap="nowrap"
+                >
+                  <RouterLink to="/" style={{ textDecoration: 'none', flex: '1' }}>
+                    <Box
+                      p={1}
+                      bg="rgba(251, 164, 30, 0.8)"
+                      borderRadius="md"
+                      _hover={{ bg: "rgba(251, 164, 30, 1)" }}
+                      textAlign="center"
+                      color="white"
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      width="100%"
+                      cursor="pointer"
+                    >
+                      <Image src="/images/direct-marketing.svg" alt="Claim Icon" boxSize="20px" mb={1} />
+                      <Text fontSize="x-small">Presale</Text>
+                    </Box>
+                  </RouterLink>
+                  <RouterLink to="/token" style={{ textDecoration: 'none', flex: '1' }}>
+                    <Box
+                      p={1}
+                      bg="rgba(251, 164, 30, 0.8)"
+                      borderRadius="md"
+                      _hover={{ bg: "rgba(251, 164, 30, 1)" }}
+                      textAlign="center"
+                      color="white"
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      width="100%"
+                      cursor="pointer"
+                    >
+                      <Image src="/images/admin-panel.svg" alt="Claim Icon" boxSize="20px" mb={1} />
+                      <Text fontSize="x-small">Token</Text>
+                    </Box>
+                  </RouterLink>
+                  <RouterLink to="/stake" style={{ textDecoration: 'none', flex: '1' }}>
+                    <Box
+                      p={1}
+                      bg="rgba(251, 164, 30, 0.8)"
+                      borderRadius="md"
+                      _hover={{ bg: "rgba(251, 164, 30, 1)" }}
+                      textAlign="center"
+                      color="white"
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      width="100%"
+                      cursor="pointer"
+                    >
+                      <Image src="/images/doge.svg" alt="Claim Icon" boxSize="20px" mb={1} />
+                      <Text fontSize="x-small">NFT Stake</Text>
+                    </Box>
+                  </RouterLink>
+                  <RouterLink to="/intromint" style={{ textDecoration: 'none', flex: '1' }}>
+                    <Box
+                      p={1}
+                      bg="rgba(251, 164, 30, 0.8)"
+                      borderRadius="md"
+                      _hover={{ bg: "rgba(251, 164, 30, 1)" }}
+                      textAlign="center"
+                      color="white"
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      width="100%"
+                      cursor="pointer"
+                    >
+                      <Image src="/images/mining.svg" alt="Claim Icon" boxSize="20px" mb={1} />
+                      <Text fontSize="x-small">Mint</Text>
+                    </Box>
+                  </RouterLink>
+                </Flex>
+              </Box>
+
+              {/* Right column - Adjust styles for different screen sizes */}
+              <Box
+                flex={1}
+                m={{ base: 0, md: 2 }} // Remove margin on smaller devices
+                p={{ base: 0, md: 2 }} // Remove padding on smaller devices
+                maxW="480px"
+                bg={{ base: 'transparent', md: 'rgba(0, 0, 0, 0.75)' }} // Remove background on smaller devices
+                borderRadius={{ base: 'none', md: '2xl' }} // Remove border radius on smaller devices
+                boxShadow={{ base: 'none', md: 'md' }} // Remove shadow on smaller devices
+                textAlign="center"
+                border={{ base: 'none', md: '2px' }} // Remove border on smaller devices
+                borderColor={{ base: 'transparent', md: '#fff' }} // Hide border on smaller devices
               >
                 <Presalecomponent />
-              </Box>
-            </Flex>
-
-            {/* Presale message box - Always visible */}
-            <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
-              <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" bg="rgba(0, 0, 0, 0.61)" border="2px" borderColor="#fff">
-                <RouterLink to="/">
-                  <Text textAlign="center" color="white" fontSize="4xl" fontWeight="bolder">
-                    Presale is Live!
-                  </Text>
-                  <Image src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
-                </RouterLink>
               </Box>
             </Flex>
           </Box>

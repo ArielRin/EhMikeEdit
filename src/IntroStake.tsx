@@ -269,21 +269,10 @@ const NewPage = () => {
               </Box>
             </Flex>
 
-            {/* Presale message box - Always visible */}
-            <Flex justifyContent="center" p={0} flexWrap="wrap" position="relative">
-              <Box flex={1} minW="300px" m={2} p={7} borderRadius="2xl" boxShadow="md" textAlign="center" bg="rgba(0, 0, 0, 0.61)" border="2px" borderColor="#fff">
-                <RouterLink to="/">
-                  <Text textAlign="center" color="white" fontSize="4xl" fontWeight="bolder">
-                    Presale is Live!
-                  </Text>
-                  <Image src="images/logobwb.png" alt="header" mx="auto" width="40%" minW="250px" mt="28px" />
-                </RouterLink>
-              </Box>
-            </Flex>
+
           </Box>
         </Box>
       </Box>
-      <Footer />
     </>
   );
 };
