@@ -389,10 +389,10 @@ try {
 
 
     return (
-      <Box bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
-        <Box p={2} maxW="1000px" mx="auto">
-          <Flex borderRadius="3xl" border="2px" borderColor="#fff"  p={6} bg="rgba(0, 0, 0, 0.65)" justify="space-between" align="center">
-          <Image src="/images/logobwb.png" alt="header" width="40%"  minW="200px" />
+      <Box bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
+        <Box p={0} maxW="1000px" mx="auto">
+          <Flex borderRadius="3xl"   p={6}  justify="space-between" align="center">
+          <Image src="/images/logobwb.png" alt="header" width="40%"  minW="150px" />
           <Flex align="right">
             <w3m-button />
           </Flex>
@@ -400,10 +400,10 @@ try {
         {/* Flex container for Unstaked and Staked NFTs */}
         <Flex direction={{ base: "column", md: "row" }} gap={3} mt={3}>
 
-        
+
 
           {/* Staked NFTs */}
-          <Box  textAlign="center" borderRadius="3xl" border="2px" borderColor="#fff"  flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} >
+          <Box minH="420px"  textAlign="center" borderRadius="3xl"   flex={1} bg="rgba(0, 0, 0, 0)" p={6} >
             <Heading size="sm" mb={4}>Your Staked NFTs</Heading>
             <Grid templateColumns="repeat(3, 1fr)" gap={3}>
               {userStakedTokens.map(tokenId => (
@@ -414,7 +414,6 @@ try {
                       alt={`NFT ${tokenId}`}
                       mb={2}
                     />
-                    <Text fontSize="sm" >NFT #{tokenId}</Text>
                     <Checkbox
                       isChecked={selectedTokenIds.includes(tokenId)}
                       onChange={() => handleTokenSelection(tokenId)}
@@ -425,7 +424,7 @@ try {
                 </GridItem>
               ))}
             </Grid>
-            <Button mt={4} colorScheme="orange" onClick={withdrawNFTs}>
+            <Button mt={4} color="white" bg="rgba(251, 164, 30, 1)" onClick={withdrawNFTs}>
               Unstake
             </Button>
             <Text mt={6}><strong>Unstake your NFTs to Claim Rewards</strong></Text>
@@ -434,10 +433,10 @@ try {
         </Flex>
 
           {/* Staking Stats */}
-          <Box mt={3} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
+          <Box mt={3} bg="rgba(0, 0, 0, 0)" p={2} borderRadius="lg">
           <Grid templateColumns={{ base:  "repeat(2, 1fr)" , md: "repeat(2, 1fr)" }} gap={3} >
               {/* Pending Reward */}
-              <Box  borderRadius="3xl" border="2px" borderColor="#fff"   p={6} bg="rgba(0, 0, 0, 0.65)" textAlign="center">
+              <Box  borderRadius="3xl" border="1px solid gray"   p={6} bg="rgba(0, 0, 0, 0)" textAlign="center">
                 <Text fontSize="lg" fontWeight="bold" mb={4}>
                   Pending Reward
                 </Text>
@@ -450,7 +449,7 @@ try {
               </Box>
 
               {/* Blocks Remaining */}
-              <Box  borderRadius="3xl" border="2px" borderColor="#fff"   p={6} bg="rgba(0, 0, 0, 0.65)" textAlign="center">
+              <Box  borderRadius="3xl" border="1px solid gray"    p={6} bg="rgba(0, 0, 0, 0)" textAlign="center">
                 <Text fontSize="lg" fontWeight="bold" mb={4}>
                   Blocks Remaining
                 </Text>
@@ -465,7 +464,7 @@ try {
 
             <Grid templateColumns={{ base:  "repeat(2, 1fr)" , md: "repeat(2, 1fr)" }} gap={3} mt={3}>
               {/* Remaining Rewards */}
-              <Box  borderRadius="3xl" border="2px" borderColor="#fff"   p={6} bg="rgba(0, 0, 0, 0.65)" textAlign="center">
+              <Box  borderRadius="3xl"  border="1px solid gray"   p={6} bg="rgba(0, 0, 0, 0)" textAlign="center">
                 <Text fontSize="lg" fontWeight="bold" mb={4}>
                   Pool Total
                 </Text>
@@ -481,7 +480,7 @@ try {
                 </Text>
               </Box>
               {/* User Staked Tokens Count */}
-              <Box  borderRadius="3xl" border="2px" borderColor="#fff"   p={6} bg="rgba(0, 0, 0, 0.65)" textAlign="center">
+              <Box  borderRadius="3xl" border="1px solid gray"    p={6}  textAlign="center">
                 <Text fontSize="lg" fontWeight="bold" mb={4}>
                   Your Staked NFTs
                 </Text>
@@ -497,45 +496,14 @@ try {
 
             </Grid>
           </Box>
-          {/* Reward Token Price */}
-          <Box gap={3} mt={3}  borderRadius="3xl" border="2px" borderColor="#fff"  p={6} bg="rgba(0, 0, 0, 0.65)"  textAlign="center">
-            <Text fontSize="lg" fontWeight="bold" mb={4}>
-              Token Price
-            </Text>
-            <Text fontSize="xl" fontWeight="bold" color="white">
-              ${rewardTokenPrice.toFixed(8)}
-            </Text>
-            <Text fontSize="md" mt={2}>USD per Token</Text>
 
 
-            <Text fontSize="6px" mt={0}>
-              {rewardTokenAddress}
-            </Text>
-          </Box>
 
-        <Box borderRadius="3xl" border="2px" borderColor="#fff"   gap={3} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} mt={3}>
-
-                  <Flex textAlign="center"  justifyContent="space-between" mt={8}>
-                    <Box>
-                      <Link href={`${baseScanUrl}address/${contractAddress}`} isExternal color="white" fontWeight="bold">
-                        View Staking Contract on BaseScan
-                      </Link>
-                    </Box>
-                    <Box>
-                      <Link href={`${baseScanUrl}token/${rewardTokenAddress}`} isExternal color="white" fontWeight="bold">
-                        View Reward Token on BaseScan
-                      </Link>
-                    </Box>
-                  </Flex>
-                </Box>
 
 
 
       </Box>
 
-              <Box p={6} mt={3} minH="250px" bg="rgba(0, 0, 0, 0.65)">
-
-            </Box>
     </Box>
   );
 };

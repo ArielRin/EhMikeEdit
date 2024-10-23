@@ -20,6 +20,9 @@ import NftStakeStats from './3wNftStakeStats';
 import NftStakeStats2 from './NftStakeStats';
 import Stakecalc from './Stakecalc';
 import AllPresales from './AllPresales';
+import IntroStake from './IntroStake';
+import IntroMint from './IntroMint';
+import Mint from './Components/NftMint0/NftMint0';
 
 
 import { ethers, BrowserProvider } from 'ethers';
@@ -169,11 +172,14 @@ const modal = createWeb3Modal({
           <Route path="/deploy" element={<DeployPoolPage />} />
           <Route path="/admindeploy" element={<AdminDeployPoolPage />} />
           <Route path="/apipools" element={<DeployPoolAPI />} />
-          <Route path="/stake" element={<ThirdWebNftStakePage />} />
+          <Route path="/oldstake" element={<ThirdWebNftStakePage />} />
           <Route path="/nftstats" element={<NftStakeStats />} />
           <Route path="/stakecalc" element={<Stakecalc />} />
           <Route path="/allpresales" element={<AllPresales />} />
           <Route path="/introadmin" element={<IntroAdmin />} />
+          <Route path="/intromint" element={<IntroMint />} />
+          <Route path="/stake" element={<IntroStake />} />
+          <Route path="/mint" element={<Mint />} />
       </Routes>
     </Router>
   );

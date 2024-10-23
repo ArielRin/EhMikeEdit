@@ -155,6 +155,8 @@ const NewPage = () => {
               </Box>
 
 
+
+
                             {/* Box above the right column - only visible on smaller screens */}
                             <Box
                               flex={1}
@@ -251,6 +253,8 @@ const NewPage = () => {
                             </Box>
 
 
+
+
               {/* Right column - Always visible */}
               <Box
                 flex={1}
@@ -263,7 +267,7 @@ const NewPage = () => {
                 border="2px"
                 borderColor="#fff"
               >
-                <Presalecomponent />
+                <Mint />
               </Box>
             </Flex>
 
