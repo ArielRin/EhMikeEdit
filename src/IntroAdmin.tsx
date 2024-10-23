@@ -42,7 +42,7 @@ const NewPage = () => {
 
 
 
-              <Box flex={1}  m={2}  borderRadius="2xl" boxShadow="md" textAlign="center" border="2px" borderColor="#fff"  bgImage="/images/b2.png" bgSize="cover" bgPosition="left">
+              <Box flex={1}  m={2} boxShadow="md" textAlign="center" borderRadius="2xl" border="2px" borderColor="#fff"  bgImage="/images/b2.png" bgSize="cover" bgPosition="left">
               <Box p={0} m={0}  borderRadius="2xl" height="100%" bg="rgba(0, 0, 0, 0.65)">
               <Flex flex={1} m={0} p={7}  textAlign="center"  flexWrap="wrap" alignItems="center" justifyContent="center" h="auto" flexDirection="column">
       <Flex mt="15px" mb="15px" justify="center" align="center" gap={4}>

@@ -390,102 +390,20 @@ try {
 
     return (
       <Box bgImage="/images/b3.png" bgPosition="center" bgRepeat="no-repeat" bgSize="cover" color="white" mx="auto">
-        <Box maxW="1000px" mx="auto">
-          <Flex p={6} bg="rgba(0, 0, 0, 0.65)" justify="space-between" align="center">
-          <Heading>BabyDoge on Base NFT Staking Stats</Heading>
+        <Box  maxW="1000px" mx="auto">
+          <Flex borderRadius="3xl" border="2px" borderColor="#fff"  p={6} bg="rgba(0, 0, 0, 0.65)" justify="space-between" align="center">
+          <Heading size="lg" >BabyDoge on Base NFT Staking Stats</Heading>
           <Flex align="right">
             <w3m-button />
           </Flex>
         </Flex>
-        <Heading p={2} bg="rgba(0, 0, 0, 0.65)" size="md">
-          Stake BabyDoge on Base NFT - Earn BabyDoge
-        </Heading>
-
-          {/* Staking Stats */}
-          <Box mt={6} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
-            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6}>
-              {/* Pending Reward */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  Pending Reward
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  {pendingReward}
-                </Text>
-                <Text fontSize="lg" mt={2}>
-                  ({pendingRewardUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                </Text>
-              </Box>
-
-              {/* Blocks Remaining */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  Blocks Remaining
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  {remainingBlocks}
-                </Text>
-                <Text fontSize="lg" mt={2}>Until End of Staking</Text>
-              </Box>
-
-              {/* User Staked Tokens Count */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  Your Staked NFTs
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  {userStakedTokenCount}
-                </Text>
-                <Text fontSize="lg" mt={2}>NFTs Staked</Text>
-
-                                <Text fontSize="8px" mt={0}>
-                                  {nftContractAddress}
-                                </Text>
-              </Box>
-            </Grid>
-
-            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mt={6}>
-              {/* Remaining Rewards */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  Remaining Rewards to Distribute
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  {parseFloat(rewardTokenBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                </Text>
-                <Text fontSize="lg" mt={2}>
-                  (${rewardTokenBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                </Text>
-
-                <Text fontSize="8px" mt={0}>
-                  {contractAddress}
-                </Text>
-              </Box>
-
-              {/* Reward Token Price */}
-              <Box p={6} bg="rgba(0, 0, 0, 0.65)" borderRadius="lg" textAlign="center">
-                <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                  $BBDOGE Token Price
-                </Text>
-                <Text fontSize="4xl" fontWeight="bold" color="white">
-                  ${rewardTokenPrice.toFixed(8)}
-                </Text>
-                <Text fontSize="lg" mt={2}>USD per Token</Text>
-
-
-                <Text fontSize="8px" mt={0}>
-                  {rewardTokenAddress}
-                </Text>
-              </Box>
-            </Grid>
-          </Box>
         {/* Flex container for Unstaked and Staked NFTs */}
-        <Flex direction={{ base: "column", md: "row" }} gap={6} mt={6}>
+        <Flex direction={{ base: "column", md: "row" }} gap={3} mt={3}>
 
           {/* Unstaked NFTs */}
-          <Box flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
+          <Box  textAlign="center" borderRadius="3xl" border="2px" borderColor="#fff"  flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} >
             <Heading size="md" mb={4}>Your Unstaked NFTs</Heading>
-            <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+            <Grid templateColumns="repeat(3, 1fr)" gap={3}>
   {ownedNFTs.map(tokenId => (
     <GridItem key={tokenId}>
       <Box border="1px solid gray" borderRadius="2xl" p={4} textAlign="center">
@@ -512,9 +430,9 @@ try {
           </Box>
 
           {/* Staked NFTs */}
-          <Box flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md">
+          <Box  textAlign="center" borderRadius="3xl" border="2px" borderColor="#fff"  flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} >
             <Heading size="md" mb={4}>Your Staked NFTs</Heading>
-            <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+            <Grid templateColumns="repeat(3, 1fr)" gap={3}>
               {userStakedTokens.map(tokenId => (
                 <GridItem key={tokenId}>
                   <Box border="1px solid gray" borderRadius="2xl" p={4} textAlign="center">
@@ -541,9 +459,89 @@ try {
 
           </Box>
         </Flex>
-        <Box gap={6} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} borderRadius="md" mt={8}>
 
-                  <Flex   justifyContent="space-between" mt={8}>
+          {/* Staking Stats */}
+          <Box mt={3} bg="rgba(0, 0, 0, 0)" p={0} borderRadius="lg">
+            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={3}>
+              {/* Pending Reward */}
+              <Box  borderRadius="3xl" border="2px" borderColor="#fff"   p={6} bg="rgba(0, 0, 0, 0.65)" textAlign="center">
+                <Text fontSize="xl" fontWeight="bold" mb={4}>
+                  Pending Reward
+                </Text>
+                <Text fontSize="2xl" fontWeight="bold" color="white">
+                  {pendingReward}
+                </Text>
+                <Text fontSize="lg" mt={2}>
+                  ({pendingRewardUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                </Text>
+              </Box>
+
+              {/* Blocks Remaining */}
+              <Box  borderRadius="3xl" border="2px" borderColor="#fff"   p={6} bg="rgba(0, 0, 0, 0.65)" textAlign="center">
+                <Text fontSize="xl" fontWeight="bold" mb={4}>
+                  Blocks Remaining
+                </Text>
+                <Text fontSize="2xl" fontWeight="bold" color="white">
+                  {remainingBlocks}
+                </Text>
+                <Text fontSize="lg" mt={2}>Until End of Staking</Text>
+              </Box>
+
+              {/* User Staked Tokens Count */}
+              <Box  borderRadius="3xl" border="2px" borderColor="#fff"   p={6} bg="rgba(0, 0, 0, 0.65)" textAlign="center">
+                <Text fontSize="xl" fontWeight="bold" mb={4}>
+                  Your Staked NFTs
+                </Text>
+                <Text fontSize="2xl" fontWeight="bold" color="white">
+                  {userStakedTokenCount}
+                </Text>
+                <Text fontSize="lg" mt={2}>NFTs Staked</Text>
+
+                                <Text fontSize="8px" mt={0}>
+                                  {nftContractAddress}
+                                </Text>
+              </Box>
+            </Grid>
+
+            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={3} mt={3}>
+              {/* Remaining Rewards */}
+              <Box  borderRadius="3xl" border="2px" borderColor="#fff"   p={6} bg="rgba(0, 0, 0, 0.65)" textAlign="center">
+                <Text fontSize="xl" fontWeight="bold" mb={4}>
+                  Remaining Rewards to Distribute
+                </Text>
+                <Text fontSize="2xl" fontWeight="bold" color="white">
+                  {parseFloat(rewardTokenBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                </Text>
+                <Text fontSize="lg" mt={2}>
+                  (${rewardTokenBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                </Text>
+
+                <Text fontSize="8px" mt={0}>
+                  {contractAddress}
+                </Text>
+              </Box>
+
+              {/* Reward Token Price */}
+              <Box  borderRadius="3xl" border="2px" borderColor="#fff"  p={6} bg="rgba(0, 0, 0, 0.65)"  textAlign="center">
+                <Text fontSize="xl" fontWeight="bold" mb={4}>
+                  $BBDOGE Token Price
+                </Text>
+                <Text fontSize="2xl" fontWeight="bold" color="white">
+                  ${rewardTokenPrice.toFixed(8)}
+                </Text>
+                <Text fontSize="lg" mt={2}>USD per Token</Text>
+
+
+                <Text fontSize="8px" mt={0}>
+                  {rewardTokenAddress}
+                </Text>
+              </Box>
+            </Grid>
+          </Box>
+
+        <Box borderRadius="3xl" border="2px" borderColor="#fff"   gap={3} flex={1} bg="rgba(0, 0, 0, 0.65)" p={6} mt={3}>
+
+                  <Flex textAlign="center"  justifyContent="space-between" mt={8}>
                     <Box>
                       <Link href={`${baseScanUrl}address/${contractAddress}`} isExternal color="white" fontWeight="bold">
                         View Staking Contract on BaseScan
@@ -561,7 +559,7 @@ try {
 
       </Box>
 
-              <Box p={6} mt={6} minH="250px" bg="rgba(0, 0, 0, 0.65)">
+              <Box p={6} mt={3} minH="250px" bg="rgba(0, 0, 0, 0.65)">
 
             </Box>
     </Box>

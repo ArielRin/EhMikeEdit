@@ -270,7 +270,7 @@ const TokenDeploymentCalculator: React.FC = () => {
         bgRepeat="no-repeat"
         bgSize="cover"
         color="white"
-        width="100%"
+        width="99%"
         >
 
 
@@ -282,62 +282,62 @@ const TokenDeploymentCalculator: React.FC = () => {
                   <Doughnut data={pieData} options={pieOptions} />
                 </Box>
 
-                  <Text fontSize="lg" fontWeight="bold" mt={6} mb={4}>Deployment Figures and Percentages</Text>
+                  <Text  fontSize="lg" fontWeight="bold" mt={10} mb={8}>Deployment Figures and Percentages</Text>
                   <HStack justifyContent="space-between" mt={2}>
                     <HStack>
                       <Box width="15px" height="15px" bg="#FF6384" border="2px solid white" borderRadius="2px" />
-                      <Text>To Burn:</Text>
+                      <Text >To Burn:</Text>
                     </HStack>
-                    <Text>{burnTokens.toLocaleString()} ({((burnTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+                    <Text fontSize="sm">{burnTokens.toLocaleString()} ({((burnTokens / totalTokens) * 100).toFixed(2)}%)</Text>
                   </HStack>
                   <HStack justifyContent="space-between" mt={2}>
                     <HStack>
                       <Box width="15px" height="15px" bg="#0052FF" border="2px solid white" borderRadius="2px" />
                       <Text>Initial Token Qty:</Text>
                     </HStack>
-                    <Text>{liquidityPoolTokens.toLocaleString()} ({((liquidityPoolTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+                    <Text fontSize="sm">{liquidityPoolTokens.toLocaleString()} ({((liquidityPoolTokens / totalTokens) * 100).toFixed(2)}%)</Text>
                   </HStack>
                   <HStack justifyContent="space-between" mt={2}>
                     <HStack>
                       <Box width="15px" height="15px" bg="#00C2FF" border="2px solid white" borderRadius="2px" />
                       <Text>Presale:</Text>
                     </HStack>
-                    <Text>{totalTokensOfferedPresale.toLocaleString()} ({((totalTokensOfferedPresale / totalTokens) * 100).toFixed(2)}%)</Text>
+                    <Text fontSize="sm">{totalTokensOfferedPresale.toLocaleString()} ({((totalTokensOfferedPresale / totalTokens) * 100).toFixed(2)}%)</Text>
                   </HStack>
                   <HStack justifyContent="space-between" mt={2}>
                     <HStack>
                       <Box width="15px" height="15px" bg="#0091FF" border="2px solid white" borderRadius="2px" />
                       <Text>Dev/Marketing:</Text>
                     </HStack>
-                    <Text>{devMarketingTokens.toLocaleString()} ({((devMarketingTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+                    <Text fontSize="sm">{devMarketingTokens.toLocaleString()} ({((devMarketingTokens / totalTokens) * 100).toFixed(2)}%)</Text>
                   </HStack>
                   <HStack justifyContent="space-between" mt={2}>
                     <HStack>
                       <Box width="15px" height="15px" bg="#8f8f8f" border="2px solid white" borderRadius="2px" />
                       <Text>Unreleased:</Text>
                     </HStack>
-                    <Text>{unreleasedTokens.toLocaleString()} ({((unreleasedTokens / totalTokens) * 100).toFixed(2)}%)</Text>
+                    <Text fontSize="sm">{unreleasedTokens.toLocaleString()} ({((unreleasedTokens / totalTokens) * 100).toFixed(2)}%)</Text>
                   </HStack>
                   <HStack justifyContent="space-between" mt={2}>
                     <HStack>
-                      <Box width="15px" height="15px" bg="#65fa64" border="2px solid white" borderRadius="2px" />
-                      <Text>To be Released:</Text>
+                      <Box mb={10} width="15px" height="15px" bg="#65fa64" border="2px solid white" borderRadius="2px" />
+                      <Text mb={10}>To be Released:</Text>
                     </HStack>
-                    <Text>{(totalTokens - unreleasedTokens).toLocaleString()} ({(((totalTokens - unreleasedTokens) / totalTokens) * 100).toFixed(2)}%)</Text>
+                    <Text fontSize="sm" mb={10}>{(totalTokens - unreleasedTokens).toLocaleString()} ({(((totalTokens - unreleasedTokens) / totalTokens) * 100).toFixed(2)}%)</Text>
                   </HStack>
 
-                  <Text mt={8} fontSize="lg" fontWeight="bold" mb={4}>Summary</Text>
+                  <Text mt={10} fontSize="lg" fontWeight="bold" mb={4}>Summary</Text>
                   <HStack justifyContent="space-between">
                     <Text>Total Token Supply:</Text>
-                    <Text>{totalTokens.toLocaleString()}</Text>
+                    <Text fontSize="sm">{totalTokens.toLocaleString()}</Text>
                   </HStack>
                   <HStack justifyContent="space-between" mt={2}>
                     <Text>Minimum Launch Price:</Text>
                     <FormattedPrice price={minLaunchPrice} />
                     </HStack>
                   <HStack justifyContent="space-between" mt={2}>
-                    <Text>Soft Cap Reached:</Text>
-                    <Text mb={4}>${softCap.toLocaleString()} / ${contributionsUSD.toLocaleString()}</Text>
+                    <Text mb={4}>Soft Cap Reached:</Text>
+                    <Text  mb={4}>${contributionsUSD.toLocaleString()} of ${softCap.toLocaleString()} </Text>
                   </HStack>
                 </Box>
       </Flex>
